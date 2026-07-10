@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		056ACF842FFFE69100F40080 /* SwiftRAW.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 056ACF7A2FFFE69100F40080 /* SwiftRAW.framework */; };
-		056ACFD32FFFE70900F40080 /* SwiftRAW.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFD12FFFE70900F40080 /* SwiftRAW.swift */; };
 		056ACFE12FFFE70900F40080 /* LibRAWVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFE02FFFE70900F40080 /* LibRAWVersion.swift */; };
 		056ACFF12FFFE70900F40080 /* RAWError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFF02FFFE70900F40080 /* RAWError.swift */; };
 		056ACFF32FFFE70900F40080 /* RAWFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFF22FFFE70900F40080 /* RAWFile.swift */; };
@@ -106,7 +105,6 @@
 		056ACFCD2FFFE70100F40080 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		056ACFCE2FFFE70100F40080 /* Release - ccache.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release - ccache.xcconfig"; sourceTree = "<group>"; };
 		056ACFCF2FFFE70100F40080 /* Release - Library.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release - Library.xcconfig"; sourceTree = "<group>"; };
-		056ACFD12FFFE70900F40080 /* SwiftRAW.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRAW.swift; sourceTree = "<group>"; };
 		056ACFE02FFFE70900F40080 /* LibRAWVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibRAWVersion.swift; sourceTree = "<group>"; };
 		056ACFF02FFFE70900F40080 /* RAWError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWError.swift; sourceTree = "<group>"; };
 		056ACFF22FFFE70900F40080 /* RAWFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWFile.swift; sourceTree = "<group>"; };
@@ -318,7 +316,6 @@
 				056AD0002FFFE70900F40080 /* Image */,
 				056AD0242FFFE70900F40080 /* Lens */,
 				056AD0112FFFE70900F40080 /* Metadata */,
-				056ACFD12FFFE70900F40080 /* SwiftRAW.swift */,
 			);
 			path = SwiftRAW;
 			sourceTree = "<group>";
@@ -584,7 +581,6 @@
 				056AD0282FFFE70900F40080 /* RAWMakerNoteLensInfo.swift in Sources */,
 				056AD02A2FFFE70900F40080 /* RAWDNGLensInfo.swift in Sources */,
 				056AD02C2FFFE70900F40080 /* RAWCameraMetadata.swift in Sources */,
-				056ACFD32FFFE70900F40080 /* SwiftRAW.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -664,7 +664,7 @@
     </div>
 
     <div class="milestone">
-        <h3><span class="num">M8.</span> README, final sync &amp; green-build verification <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M8.</span> README, final sync &amp; green-build verification <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Ship-ready documentation and a verified, fully in-sync Xcode + SwiftPM build matching CI.</p>
         <div class="field">
             <div class="field-label">Tasks</div>
@@ -682,10 +682,22 @@
                     <code>Docs/agent-plans/completed</code> at the user's discretion.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <ul>
+                <li><strong>Rewrote <code>README.md</code></strong>: About, read-only Status, Requirements (macOS 15, Swift 6 with C++ interop, LibRAW 0.22.1 as a vendored universal <code>x86_64</code>+<code>arm64</code> static lib), Conformance &amp; Limitations, SwiftPM consumption via <code>branch:</code>/<code>revision:</code>, the <code>--recursive</code> clone note, and a worked usage example. Kept the existing badges and repository-info footer.</li>
+                <li>Per owner feedback: <strong>no mention of the reference libraries</strong> (SwiftFITS / SwiftXISF) anywhere; and the usage example follows the project's own conventions (no force-unwraps, and it uses <code>withRawImage</code>'s return value rather than discarding it).</li>
+                <li>Per owner confirmation: <strong>removed the content-free <code>SwiftRAW/SwiftRAW.swift</code> placeholder</strong> (license header + <code>import Foundation</code>, no declarations) and its four references from the Xcode project.</li>
+                <li><strong>Confirmed full SwiftDoc coverage</strong> on public and private members, and that the Xcode project and <code>Package.swift</code> are fully in sync — all 33 source files are present in both, and SwiftPM auto-discovers the target directories.</li>
+            </ul>
+            <p><strong>Final verification — the full CI-equivalent suite, all green:</strong> <code>swift build</code> / <code>swift test</code> in debug and release (46 tests each), <code>xcodebuild</code> Debug <code>test</code>, and <code>xcodebuild</code> Release <code>build</code>. With a real Canon <code>.CR3</code> fixture present locally, the fixture-parameterized open/unpack/metadata/CFA/color/lens/sensor-buffer tests run end-to-end (they run zero cases in CI, which has no fixture, by design).</p>
+            <p><strong>Automated review loop:</strong> 1 round; converged with no findings. The reviewer verified every symbol and claim in the README against the actual source, the placeholder removal's pbxproj consistency, SwiftDoc completeness, and all four green build/test paths.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>One fresh-context review round; converged with <strong>no findings</strong>.</p>
+            <p>The reviewer confirmed: every symbol in the README example exists with the shown signature and the snippet would compile (no force-unwraps; <code>withRawImage</code>'s optional result is guarded); the description-format comments match the actual <code>description</code> implementations; the Requirements are true (<code>MACOSX_DEPLOYMENT_TARGET = 15.0</code>, <code>SWIFT_VERSION = 6.0</code>, no <code>platforms</code> in <code>Package.swift</code>, LibRAW 0.22.1, universal <code>x86_64</code>+<code>arm64</code> <code>.a</code> via <code>lipo</code>); the conformance/limitations claims match the code (read-only, curated metadata, Bayer buffer + descriptor, not <code>Sendable</code>, <code>branch:</code>/<code>revision:</code> consumption); no SwiftFITS/SwiftXISF references remain; the <code>SwiftRAW.swift</code> removal left no dangling pbxproj refs and the target still has its sources; SwiftDoc coverage is complete; and all four CI-equivalent invocations pass with Xcode and SwiftPM in sync.</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 
