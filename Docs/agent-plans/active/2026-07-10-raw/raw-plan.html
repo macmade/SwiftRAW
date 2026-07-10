@@ -438,7 +438,7 @@
     <div class="phase-label">Phase 3 · Structured metadata</div>
 
     <div class="milestone">
-        <h3><span class="num">M3.</span> Image geometry &amp; identification (<code>sizes</code> + <code>iparams</code>) <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M3.</span> Image geometry &amp; identification (<code>sizes</code> + <code>iparams</code>) <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Expose the image geometry and camera identification that describe the sensor layout —
             the foundation every other consumer needs.</p>
         <div class="field">
@@ -455,10 +455,29 @@
                     sample.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <ul>
+                <li><strong><code>RAWImageSizes</code></strong> (<code>Image/</code>) from <code>libraw_image_sizes_t</code>: raw &amp; output width/height, top/left margins, <code>iwidth</code>/<code>iheight</code>, raw pitch, pixel aspect, flip. <code>Sendable</code>/<code>Equatable</code> value type with a public memberwise init plus an <code>internal init(from:)</code> reading the C struct.</li>
+                <li><strong><code>RAWImageInfo</code></strong> (<code>Image/</code>) from <code>libraw_iparams_t</code>: make/model/software, normalized make/model, colors, filters, color descriptor (<code>cdesc</code>), raw count, DNG version, plus <code>isFoveon</code> — a small addition beyond the plan's list, since it's directly relevant to interpreting the CFA (Foveon sensors have none).</li>
+                <li><strong><code>RAWCFAPattern</code></strong> (<code>Image/</code>): classifies the layout as <code>none</code>/<code>bayer</code>/<code>xTrans</code> from <code>filters</code> (0 → none, 9 → X-Trans, else Bayer), with <code>color(atRow:column:)</code> and <code>channel(atRow:column:)</code>. The Bayer path is LibRAW's exact <code>FC</code> formula; the X-Trans path reads the 6×6 <code>xtrans</code> grid with negative-safe wrapping. A per-pixel lookup equivalent to LibRAW's <code>COLOR(row,col)</code> for the two common layouts (documented scope).</li>
+                <li><strong><code>String(cCharArray:)</code></strong> (<code>Extensions/</code>): converts LibRAW's fixed C <code>char[]</code> fields (imported as tuples) to <code>String</code>, bounded to the tuple's bytes and stopping at the first <code>NUL</code> — safe even for non-terminated arrays.</li>
+                <li>Exposed <code>imageSizes</code> / <code>imageInfo</code> / <code>cfaPattern</code> as computed properties on <code>RAWFile</code>, reading <code>imgdata.sizes</code> / <code>imgdata.idata</code> through the stable pointer (the M2-validated read path).</li>
+            </ul>
+            <p><strong>Tests:</strong> deterministic CFA tests run today — RGGB Bayer resolves to the correct per-pixel colors/channels (<code>0x94949494</code> + <code>"RGBG"</code>), Bayer periodicity, the no-CFA case, and an X-Trans grid lookup with wrapping. Fixture-parameterized metadata tests (sane sizes, populated identification, CFA-vs-info consistency) are in place and activate once RAW samples are supplied. 21 tests total.</p>
+            <p><strong>Verification (all green):</strong> <code>swift build</code>/<code>swift test</code> debug + release, and <code>xcodebuild</code> Debug test + Release build.</p>
+            <p><strong>Automated review loop:</strong> 1 round; converged. No Critical/High/Medium findings — field mappings and the Bayer <code>FC</code> math were verified against the vendored headers, and the <code>char[]</code>→String and <code>xtrans</code> reshape were confirmed memory-safe. Only Info-level notes (below).</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>One fresh-context review round; converged. No Critical/High/Medium findings.</p>
+            <ul>
+                <li><strong>[Info] <code>COLOR</code>-equivalence is scoped to Bayer + X-Trans</strong> &mdash; LibRAW's <code>COLOR</code> also routes some non-zero <code>filters &lt; 1000</code> values through <code>fcol()</code> (e.g. <code>filters == 1</code>) and uses <code>FCF</code> for rotated Fuji Super-CCD; those niche cases are intentionally out of the documented scope. <em>Resolution: Deferred</em> (by design).</li>
+                <li><strong>[Info] <code>readXTransPattern</code> byte-reshape has no direct running test</strong> &mdash; the X-Trans test supplies the grid directly, so the tuple→grid reshape is only reached via the fixtureless <code>init(from:)</code>. Verified by reasoning; a real Fuji fixture (or a synthetic tuple) would close the gap. <em>Resolution: Deferred</em> (revisit with fixtures / M7).</li>
+                <li><strong>[Info] Minor</strong> &mdash; <code>channel()</code> rebuilds <code>Array(colorDescription)</code> each call (negligible), and the Bayer branch of <code>color()</code> is not negative-safe while the X-Trans branch is (cosmetic; pixel coordinates are always non-negative). <em>Resolution: Deferred.</em></li>
+            </ul>
+            <p>Conventions (MIT header, one type per file across <code>Image/</code>/<code>Extensions/</code>, full SwiftDoc incl. private members, <code>let</code>, no force-unwrap, aligned <code>=</code>, map-based) confirmed; pbxproj internally consistent; no libraw types leak into the public API; no regressions (21/21 tests pass).</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 

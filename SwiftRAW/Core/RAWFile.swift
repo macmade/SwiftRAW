@@ -211,6 +211,25 @@ public final class RAWFile: CustomStringConvertible
         self.unpacked = true
     }
 
+    /// The geometry of the RAW image: sensor and output dimensions, margins,
+    /// pitch, pixel aspect, and orientation.
+    public var imageSizes: RAWImageSizes
+    {
+        RAWImageSizes( from: self.raw.pointee.imgdata.sizes )
+    }
+
+    /// Camera identification and sensor-description metadata.
+    public var imageInfo: RAWImageInfo
+    {
+        RAWImageInfo( from: self.raw.pointee.imgdata.idata )
+    }
+
+    /// The color-filter-array layout of the sensor.
+    public var cfaPattern: RAWCFAPattern
+    {
+        RAWCFAPattern( from: self.raw.pointee.imgdata.idata )
+    }
+
     /// A basic textual summary of the RAW file.
     public var description: String
     {

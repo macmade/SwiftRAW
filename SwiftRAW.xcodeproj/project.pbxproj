@@ -13,11 +13,17 @@
 		056ACFF12FFFE70900F40080 /* RAWError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFF02FFFE70900F40080 /* RAWError.swift */; };
 		056ACFF32FFFE70900F40080 /* RAWFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFF22FFFE70900F40080 /* RAWFile.swift */; };
 		056ACFF52FFFE70900F40080 /* RAWParsingOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFF42FFFE70900F40080 /* RAWParsingOptions.swift */; };
+		056AD0022FFFE70900F40080 /* RAWImageSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0012FFFE70900F40080 /* RAWImageSizes.swift */; };
+		056AD0042FFFE70900F40080 /* RAWImageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0032FFFE70900F40080 /* RAWImageInfo.swift */; };
+		056AD0062FFFE70900F40080 /* RAWCFAPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */; };
+		056AD0092FFFE70900F40080 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0082FFFE70900F40080 /* String.swift */; };
 		056ACFD62FFFE70B00F40080 /* SwiftRAWTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFD42FFFE70B00F40080 /* SwiftRAWTests.swift */; };
 		056ACFE52FFFE70B00F40080 /* TestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFE42FFFE70B00F40080 /* TestError.swift */; };
 		056ACFE72FFFE70B00F40080 /* TestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFE62FFFE70B00F40080 /* TestUtilities.swift */; };
 		056ACFEA2FFFE70B00F40080 /* RAWFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFE92FFFE70B00F40080 /* RAWFileTests.swift */; };
 		056ACFEC2FFFE70B00F40080 /* RAWErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFEB2FFFE70B00F40080 /* RAWErrorTests.swift */; };
+		056AD00C2FFFE70B00F40080 /* RAWCFAPatternTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */; };
+		056AD00E2FFFE70B00F40080 /* RAWImageMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,10 +93,16 @@
 		056ACFF02FFFE70900F40080 /* RAWError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWError.swift; sourceTree = "<group>"; };
 		056ACFF22FFFE70900F40080 /* RAWFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWFile.swift; sourceTree = "<group>"; };
 		056ACFF42FFFE70900F40080 /* RAWParsingOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWParsingOptions.swift; sourceTree = "<group>"; };
+		056AD0012FFFE70900F40080 /* RAWImageSizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageSizes.swift; sourceTree = "<group>"; };
+		056AD0032FFFE70900F40080 /* RAWImageInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageInfo.swift; sourceTree = "<group>"; };
+		056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWCFAPattern.swift; sourceTree = "<group>"; };
+		056AD0082FFFE70900F40080 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		056ACFE42FFFE70B00F40080 /* TestError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestError.swift; sourceTree = "<group>"; };
 		056ACFE62FFFE70B00F40080 /* TestUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtilities.swift; sourceTree = "<group>"; };
 		056ACFE92FFFE70B00F40080 /* RAWFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWFileTests.swift; sourceTree = "<group>"; };
 		056ACFEB2FFFE70B00F40080 /* RAWErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWErrorTests.swift; sourceTree = "<group>"; };
+		056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWCFAPatternTests.swift; sourceTree = "<group>"; };
+		056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageMetadataTests.swift; sourceTree = "<group>"; };
 		056ACFD42FFFE70B00F40080 /* SwiftRAWTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRAWTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -265,9 +277,29 @@
 			isa = PBXGroup;
 			children = (
 				056ACFE22FFFE70900F40080 /* Core */,
+				056AD0072FFFE70900F40080 /* Extensions */,
+				056AD0002FFFE70900F40080 /* Image */,
 				056ACFD12FFFE70900F40080 /* SwiftRAW.swift */,
 			);
 			path = SwiftRAW;
+			sourceTree = "<group>";
+		};
+		056AD0002FFFE70900F40080 /* Image */ = {
+			isa = PBXGroup;
+			children = (
+				056AD0012FFFE70900F40080 /* RAWImageSizes.swift */,
+				056AD0032FFFE70900F40080 /* RAWImageInfo.swift */,
+				056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */,
+			);
+			path = Image;
+			sourceTree = "<group>";
+		};
+		056AD0072FFFE70900F40080 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				056AD0082FFFE70900F40080 /* String.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		056ACFE22FFFE70900F40080 /* Core */ = {
@@ -285,11 +317,21 @@
 			isa = PBXGroup;
 			children = (
 				056ACFE82FFFE70B00F40080 /* Core */,
+				056AD00A2FFFE70B00F40080 /* Image */,
 				056ACFD42FFFE70B00F40080 /* SwiftRAWTests.swift */,
 				056ACFE42FFFE70B00F40080 /* TestError.swift */,
 				056ACFE62FFFE70B00F40080 /* TestUtilities.swift */,
 			);
 			path = SwiftRAWTests;
+			sourceTree = "<group>";
+		};
+		056AD00A2FFFE70B00F40080 /* Image */ = {
+			isa = PBXGroup;
+			children = (
+				056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */,
+				056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */,
+			);
+			path = Image;
 			sourceTree = "<group>";
 		};
 		056ACFE82FFFE70B00F40080 /* Core */ = {
@@ -418,6 +460,10 @@
 				056ACFF12FFFE70900F40080 /* RAWError.swift in Sources */,
 				056ACFF32FFFE70900F40080 /* RAWFile.swift in Sources */,
 				056ACFF52FFFE70900F40080 /* RAWParsingOptions.swift in Sources */,
+				056AD0022FFFE70900F40080 /* RAWImageSizes.swift in Sources */,
+				056AD0042FFFE70900F40080 /* RAWImageInfo.swift in Sources */,
+				056AD0062FFFE70900F40080 /* RAWCFAPattern.swift in Sources */,
+				056AD0092FFFE70900F40080 /* String.swift in Sources */,
 				056ACFD32FFFE70900F40080 /* SwiftRAW.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,6 +477,8 @@
 				056ACFE72FFFE70B00F40080 /* TestUtilities.swift in Sources */,
 				056ACFEA2FFFE70B00F40080 /* RAWFileTests.swift in Sources */,
 				056ACFEC2FFFE70B00F40080 /* RAWErrorTests.swift in Sources */,
+				056AD00C2FFFE70B00F40080 /* RAWCFAPatternTests.swift in Sources */,
+				056AD00E2FFFE70B00F40080 /* RAWImageMetadataTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
