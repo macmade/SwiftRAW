@@ -482,7 +482,7 @@
     </div>
 
     <div class="milestone">
-        <h3><span class="num">M4.</span> Exposure, shot &amp; color metadata (<code>imgother</code> + <code>colordata</code>) <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M4.</span> Exposure, shot &amp; color metadata (<code>imgother</code> + <code>colordata</code>) <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Surface the exposure/shot metadata a photographer expects, plus the color calibration
             data used to interpret the raw samples.</p>
         <div class="field">
@@ -502,10 +502,30 @@
                     profile data is absent.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <ul>
+                <li><strong><code>RAWShotInfo</code></strong> (<code>Metadata/</code>) from <code>libraw_imgother_t</code>: ISO, shutter, aperture, focal length, timestamp (<code>Date?</code>, <code>nil</code> when the file records none), shot order, image description, artist; plus <code>bodySerial</code> from <code>libraw_shootinginfo_t</code>. Camera-specific shooting-mode codes are intentionally left out of the curated, cross-vendor subset.</li>
+                <li><strong><code>RAWGPSInfo</code></strong> (<code>Metadata/</code>) from <code>libraw_gps_info_t</code>: signed decimal latitude/longitude/altitude (negative for south/west/below-sea-level) plus the hemisphere reference markers. A failable <code>init?(from:)</code> returns <code>nil</code> when <code>gpsparsed == 0</code>, so <code>RAWFile.gpsInfo</code> is <code>nil</code> for files without GPS.</li>
+                <li><strong><code>RAWColorData</code></strong> (<code>Color/</code>) from <code>libraw_colordata_t</code>: global black level, the first four per-channel <code>cblack</code> levels, saturation/observed maxima, <code>cam_mul</code>/<code>pre_mul</code>, the <code>rgb_cam</code> (3×4), <code>cam_xyz</code> (4×3) and <code>cmatrix</code> (3×4) matrices, and embedded-ICC-profile availability + length.</li>
+                <li><strong><code>CFixedArray</code></strong> (<code>Extensions/</code>): a reusable helper reading LibRAW's fixed C arrays (imported as tuples) into flat or row-major Swift arrays. M3's inline X-Trans reshape was refactored to use it (dedup); the X-Trans test confirms behavior was preserved.</li>
+                <li>Exposed <code>shotInfo</code> / <code>gpsInfo</code> / <code>colorData</code> as computed properties on <code>RAWFile</code>.</li>
+            </ul>
+            <p><strong>Two interop wrinkles:</strong> (1) <code>libraw_colordata_t</code> is ~130 KB (<code>curve[0x10000]</code> alone is 128 KB), so <code>colorData</code> reads it through a scoped <code>withUnsafePointer</code> rather than a by-value copy. (2) <code>cblack[4104]</code> and <code>curve[65536]</code> are too large for Swift to import as tuples (the fields are unavailable), so a small shim accessor <code>SwiftRAWColorDataChannelBlackLevels</code> returns <code>cblack</code>'s pointer and the first four per-channel levels are read from it.</p>
+            <p><strong>Tests:</strong> deterministic coverage runs today — the <code>CFixedArray</code> flat/row-major reshape (including a 3×4 matrix) and the GPS DMS→decimal conversion (north, negated, short/empty input). Fixture-parameterized exposure/color-array/GPS tests are in place and activate once RAW samples are supplied. 30 tests total.</p>
+            <p><strong>Verification (all green):</strong> <code>swift build</code>/<code>swift test</code> debug + release, and <code>xcodebuild</code> Debug test + Release build.</p>
+            <p><strong>Automated review loop:</strong> 1 round; converged. No Critical/High/Medium findings — every field mapping was verified against the vendored headers (including <code>rgb_cam</code> 3×4 vs <code>cam_xyz</code> 4×3 not being swapped), and the <code>CFixedArray</code> reinterpretation, the <code>cblack</code> shim, and the <code>colorData</code> pointer access were confirmed memory-safe. Two Info-level convention nits were applied.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>One fresh-context review round; converged. No Critical/High/Medium findings.</p>
+            <ul>
+                <li><strong>[Info] Non-uniform <code>=</code> alignment</strong> in <code>RAWGPSInfo.init?(from:)</code>'s local bindings. <em>Resolution: Fixed.</em></li>
+                <li><strong>[Info] Implicit <code>internal</code></strong> on <code>RAWGPSInfo.decimalDegrees</code> (sibling helper is explicitly <code>private</code>). <em>Resolution: Fixed</em> — made <code>internal</code> explicit.</li>
+                <li><strong>[Info] Absent-value representation differs by field</strong> — a missing timestamp is <code>Date?</code> (<code>nil</code>) while missing text fields are empty <code>String</code>. Flagged for API-consistency awareness; a defensible choice. <em>Resolution: Deferred</em> (by design).</li>
+            </ul>
+            <p>The reviewer verified: field names/types against <code>libraw_types.h</code>; <code>CFixedArray</code> safety (element size == stride ⇒ no padding, no over-read); the <code>cblack</code> shim in-bounds (<code>LIBRAW_CBLACK_SIZE</code> = 4104); the <code>colorData</code> pointer used only synchronously with no ~130 KB copy and no escape; correct GPS/timestamp semantics; the <code>readXTransPattern</code> refactor preserving behavior; pbxproj internal consistency; and no regressions (30/30 tests pass, Xcode under <code>-warnings-as-errors</code>).</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 

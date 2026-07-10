@@ -60,4 +60,19 @@ static inline void SwiftRAWDestroyLibRaw( LibRaw * instance )
     delete instance;
 }
 
+/// Returns a pointer to the per-channel/per-block black-level array (`cblack`)
+/// of a LibRAW color-data structure.
+///
+/// `cblack` has `LIBRAW_CBLACK_SIZE` (4104) elements, which is too large for
+/// Swift to import as a tuple, so the field is unavailable in Swift. This
+/// accessor hands back a pointer to it. The first four elements are the
+/// per-channel black-level adjustments.
+///
+/// - Parameter color: The LibRAW color-data structure.
+/// - Returns: A pointer to the `cblack` array.
+static inline const unsigned int * SwiftRAWColorDataChannelBlackLevels( const libraw_colordata_t * color )
+{
+    return color->cblack;
+}
+
 #endif /* SWIFTRAW_LIBRAW_H */

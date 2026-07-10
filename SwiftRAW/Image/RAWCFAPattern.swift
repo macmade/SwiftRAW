@@ -176,25 +176,13 @@ public struct RAWCFAPattern: Sendable, Equatable
     /// - Returns: A 6×6 grid of color indices.
     private static func readXTransPattern< T >( from xtrans: T ) -> [ [ Int ] ]
     {
-        let flat = withUnsafeBytes( of: xtrans )
-        {
-            buffer in
-
-            buffer.bindMemory( to: Int8.self ).map
-            {
-                Int( $0 )
-            }
-        }
-
-        return ( 0 ..< 6 ).map
+        CFixedArray.matrix( of: xtrans, rows: 6, columns: 6, as: Int8.self ).map
         {
             row in
 
-            ( 0 ..< 6 ).map
+            row.map
             {
-                column in
-
-                flat[ ( row * 6 ) + column ]
+                Int( $0 )
             }
         }
     }

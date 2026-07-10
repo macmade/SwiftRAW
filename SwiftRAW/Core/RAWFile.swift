@@ -230,6 +230,29 @@ public final class RAWFile: CustomStringConvertible
         RAWCFAPattern( from: self.raw.pointee.imgdata.idata )
     }
 
+    /// Exposure and shot metadata (ISO, shutter, aperture, focal length,
+    /// timestamp, description, artist, body serial).
+    public var shotInfo: RAWShotInfo
+    {
+        RAWShotInfo( from: self.raw.pointee.imgdata.other, shooting: self.raw.pointee.imgdata.shootinginfo )
+    }
+
+    /// The GPS location recorded with the file, or `nil` if none is present.
+    public var gpsInfo: RAWGPSInfo?
+    {
+        RAWGPSInfo( from: self.raw.pointee.imgdata.other.parsed_gps )
+    }
+
+    /// Color calibration data: black/saturation levels, white-balance
+    /// multipliers, and color-conversion matrices.
+    public var colorData: RAWColorData
+    {
+        withUnsafePointer( to: &self.raw.pointee.imgdata.color )
+        {
+            RAWColorData( from: $0 )
+        }
+    }
+
     /// A basic textual summary of the RAW file.
     public var description: String
     {
