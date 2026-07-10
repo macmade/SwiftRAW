@@ -253,6 +253,19 @@ public final class RAWFile: CustomStringConvertible
         }
     }
 
+    /// Lens identification and characteristics.
+    public var lensInfo: RAWLensInfo
+    {
+        RAWLensInfo( from: self.raw.pointee.imgdata.lens )
+    }
+
+    /// Camera-common maker-note metadata (flash, temperatures, color space,
+    /// firmware, sensitivity).
+    public var cameraMetadata: RAWCameraMetadata
+    {
+        RAWCameraMetadata( from: self.raw.pointee.imgdata.makernotes.common )
+    }
+
     /// A basic textual summary of the RAW file.
     public var description: String
     {

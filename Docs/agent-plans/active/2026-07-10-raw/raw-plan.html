@@ -530,7 +530,7 @@
     </div>
 
     <div class="milestone">
-        <h3><span class="num">M5.</span> Lens metadata (<code>lensinfo</code>) &amp; maker-note scope <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M5.</span> Lens metadata (<code>lensinfo</code>) &amp; maker-note scope <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Expose lens identification and settle the maker-note scope boundary explicitly.</p>
         <div class="field">
             <div class="field-label">Tasks</div>
@@ -544,10 +544,30 @@
                 <li>Tests: lens fields on samples that carry lens metadata; absent-lens graceful handling.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <p>The curated maker-note scope boundary was proposed and <strong>confirmed by the owner before implementing</strong> (per the milestone's requirement and the &ldquo;ask before big moves&rdquo; agreement).</p>
+            <ul>
+                <li><strong><code>RAWLensInfo</code></strong> (<code>Lens/</code>) from <code>libraw_lensinfo_t</code>: min/max focal, max aperture at min/max focal, EXIF max aperture, lens make / model / serial / internal serial, 35mm-equivalent focal (<code>ushort</code> → <code>Int</code>), and the nested <code>makerNotes</code> and <code>dng</code> sub-info.</li>
+                <li><strong><code>RAWMakerNoteLensInfo</code></strong> (<code>Lens/</code>), curated from <code>libraw_makernotes_lens_t</code>: lens ID (<code>UInt64</code>), lens name, a nested <code>FocalType</code> enum (<code>unknown</code>/<code>fixed</code>/<code>zoom</code>, mapped from the <code>FocalType</code> code), focal range, apertures (max at min/max focal, max, min), 35mm-equivalent focal (<code>float</code> here, distinct from the <code>ushort</code> on <code>RAWLensInfo</code>), lens f-stops, min focus distance.</li>
+                <li><strong><code>RAWDNGLensInfo</code></strong> (<code>Lens/</code>) from <code>libraw_dnglens_t</code>: focal range + apertures.</li>
+                <li><strong><code>RAWCameraMetadata</code></strong> (<code>Metadata/</code>), curated cross-vendor subset of <code>libraw_metadata_common_t</code>: flash exposure compensation / guide number, camera/sensor/lens/ambient/battery temperatures, color space, firmware, real ISO, exposure index.</li>
+                <li>Exposed <code>lensInfo</code> and <code>cameraMetadata</code> off <code>RAWFile</code>. Reading <code>imgdata.makernotes.common</code> projects only the <code>common</code> member — not the 12 large per-vendor structs it sits beside.</li>
+            </ul>
+            <p><strong>Out of scope (documented in code):</strong> the 12 per-vendor maker-note structs; the Nikon-only lens substruct; lens/camera mount &amp; format codes, <code>CamID</code>, body string; accessory (teleconverter/adapter/attachment) IDs; current focal/aperture (already in <code>RAWShotInfo</code>); AF-point data blobs; niche EXIF environmental sensors.</p>
+            <p><strong>Tests:</strong> the <code>FocalType</code> mapping (1→fixed, 2→zoom, else unknown) is covered deterministically today; fixture-parameterized lens and camera-metadata reads activate once RAW samples are supplied. 33 tests total.</p>
+            <p><strong>Verification (all green):</strong> <code>swift build</code>/<code>swift test</code> debug + release, and <code>xcodebuild</code> Debug test + Release build.</p>
+            <p><strong>Automated review loop:</strong> 1 round; converged. No findings requiring a change — all four <code>init(from:)</code> field mappings were verified name-by-name against the vendored headers, the <code>FocalType</code> mapping matches the header, and the by-value sub-struct reads were confirmed safe and free of accidental large copies. Two Info-level observations only.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>One fresh-context review round; converged. No Critical/High/Medium findings.</p>
+            <ul>
+                <li><strong>[Info] Mixed type for the 35mm-equivalent focal length</strong> — <code>Int</code> on <code>RAWLensInfo</code> but <code>Float</code> on <code>RAWLensInfo.makerNotes</code>. This faithfully mirrors the two distinct LibRAW field types (<code>ushort</code> vs <code>float</code>) and is intentional. <em>Resolution: Deferred</em> (by design).</li>
+                <li><strong>[Info] Focal test invariant</strong> — <code>RAWLensInfoTests</code> asserts <code>&gt;= 0</code> on <code>Float</code> focal values; a <code>NaN</code> from a malformed fixture would fail the assertion. Test-only, runs zero cases today. <em>Resolution: Deferred</em> (surfacing a bad value is arguably desirable).</li>
+            </ul>
+            <p>The reviewer verified every field name/type against <code>libraw_types.h</code>; that the public types expose only Swift types (no libraw leak); that <code>internal import libraw</code> and the memberwise + <code>init(from:)</code> pattern are used; pbxproj internal consistency; and no regressions (33/33 tests, Xcode under <code>-warnings-as-errors</code>).</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 
