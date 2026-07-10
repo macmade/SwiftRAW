@@ -32,14 +32,28 @@ let package = Package(
         .library( name: "SwiftRAW", targets: [ "SwiftRAW" ] ),
     ],
     targets: [
+        .systemLibrary(
+            name: "libraw",
+            path: "LibRAW/include"
+        ),
         .target(
             name: "SwiftRAW",
-            path: "SwiftRAW"
+            dependencies: [ "libraw" ],
+            path: "SwiftRAW",
+            swiftSettings: [
+                .interoperabilityMode( .Cxx ),
+            ],
+            linkerSettings: [
+                .unsafeFlags( [ "-L", "LibRAW/lib" ] ),
+            ]
         ),
         .testTarget(
             name: "SwiftRAWTests",
             dependencies: [ "SwiftRAW" ],
-            path: "SwiftRAWTests"
+            path: "SwiftRAWTests",
+            swiftSettings: [
+                .interoperabilityMode( .Cxx ),
+            ]
         ),
     ]
 )

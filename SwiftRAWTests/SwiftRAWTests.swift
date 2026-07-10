@@ -25,9 +25,33 @@
 @testable import SwiftRAW
 import Testing
 
+/// Build-system smoke tests proving that the vendored LibRAW C++ library is
+/// exposed to Swift and links correctly, through both the Xcode project and the
+/// Swift package. These exercise the C++ interoperability path (static methods
+/// and instance construction) that the rest of SwiftRAW is built on.
 struct SwiftRAWTests
 {
+    /// The LibRAW version string is readable through C++ interop and reports
+    /// the vendored library version.
     @Test
-    func example() async throws
-    {}
+    func libRAWVersionString() async throws
+    {
+        #expect( LibRAWVersion.string == "0.22.1-Release" )
+    }
+
+    /// The LibRAW version number is readable through C++ interop and matches
+    /// the vendored library version (0.22.1 → `0x001601`).
+    @Test
+    func libRAWVersionNumber() async throws
+    {
+        #expect( LibRAWVersion.number == ( 0 << 16 ) | ( 22 << 8 ) | 1 )
+    }
+
+    /// A LibRAW instance can be created and destroyed from Swift, proving that
+    /// the library links and a working LibRAW context can be spun up.
+    @Test
+    func libRAWContextCreation() async throws
+    {
+        #expect( LibRAWVersion.canCreateLibRAWContext() )
+    }
 }

@@ -1,0 +1,635 @@
+<!--
+  SwiftRAW implementation plan.
+  Living document: milestone Status / Completed / Implementation notes /
+  Automated review / Review comments fields are updated in place during
+  implementation.
+-->
+<meta charset="utf-8">
+<title>SwiftRAW — Implementation Plan</title>
+<style>
+    :root {
+        --bg:        #12151b;
+        --bg-alt:    #1a1f28;
+        --bg-card:   #1e2530;
+        --border:    #2c3542;
+        --text:      #d7dde6;
+        --text-dim:  #9aa4b2;
+        --heading:   #f2f5f9;
+        --accent:    #6cb6ff;
+        --accent-2:  #b48ead;
+        --code-bg:   #0d1017;
+        --check:     #7fd18b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        padding: 0 0 5rem;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+
+    .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 0;
+    }
+
+    h1, h2, h3, h4 { color: var(--heading); line-height: 1.25; font-weight: 650; }
+    h1 { font-size: 2rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+    h2 {
+        font-size: 1.35rem;
+        margin: 2.75rem 0 1rem;
+        padding-bottom: .4rem;
+        border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: 1.12rem; margin: 1.6rem 0 .5rem; }
+    h4 { font-size: .95rem; margin: 1.1rem 0 .3rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    p { margin: .6rem 0; }
+    ul, ol { margin: .5rem 0; padding-left: 1.4rem; }
+    li { margin: .3rem 0; }
+
+    code {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: .08em .38em;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        font-size: .86em;
+        color: #e6d7b8;
+    }
+    pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem 1.1rem;
+        overflow-x: auto;
+        line-height: 1.5;
+    }
+    pre code { background: none; border: none; padding: 0; color: var(--text); }
+
+    .meta {
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin: 1.5rem 0;
+        font-size: .95rem;
+    }
+    .meta dl { display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1rem; margin: 0; }
+    .meta dt { color: var(--text-dim); font-weight: 600; }
+    .meta dd { margin: 0; }
+
+    .subtitle { color: var(--text-dim); font-size: 1.05rem; margin: 0 0 1.25rem; }
+
+    /* Status capsules */
+    .status {
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        padding: .2em .7em;
+        border-radius: 999px;
+        vertical-align: middle;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+    .status.not-started { background: #2b3038; color: #b7c0cc; border-color: #3a424e; }
+    .status.in-progress { background: #3a2f12; color: #f0c04a; border-color: #5c4a1c; }
+    .status.completed   { background: #163021; color: #7fd18b; border-color: #245536; }
+
+    /* Milestone cards */
+    .milestone {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem 1.5rem;
+        margin: 1.25rem 0;
+    }
+    .milestone > h3 { margin-top: .2rem; display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; }
+    .milestone .num { color: var(--accent-2); font-variant-numeric: tabular-nums; }
+
+    .phase-label {
+        margin: 2.5rem 0 .25rem;
+        color: var(--accent-2);
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .field { margin-top: 1rem; }
+    .field-label {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-dim);
+        font-weight: 700;
+        margin-bottom: .25rem;
+    }
+    .placeholder { color: #6b7481; font-style: italic; }
+
+    /* task checklist */
+    .tasks { list-style: none; padding-left: 0; margin: .4rem 0; }
+    .tasks li { padding-left: 1.7rem; position: relative; }
+    .tasks li::before {
+        content: "\2610";
+        position: absolute;
+        left: 0;
+        top: -.02em;
+        color: var(--text-dim);
+        font-size: 1.05em;
+    }
+
+    .qa { margin: 1rem 0; }
+    .qa .q { color: var(--heading); font-weight: 600; margin-bottom: .1rem; }
+    .qa .a { color: var(--text-dim); margin: 0 0 1rem; padding-left: 1rem; border-left: 2px solid var(--border); }
+
+    .note-callout {
+        background: #1b2530;
+        border-left: 3px solid var(--accent);
+        border-radius: 0 8px 8px 0;
+        padding: .75rem 1rem;
+        margin: 1rem 0;
+        font-size: .95rem;
+    }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    small, .dim { color: var(--text-dim); }
+</style>
+
+<div class="wrap">
+
+    <h1>SwiftRAW — Implementation Plan</h1>
+    <p class="subtitle">A read-only Swift wrapper for LibRAW, built with direct C++ interop and modeled on SwiftFITS / SwiftXISF.</p>
+
+    <div class="meta">
+        <dl>
+            <dt>Generated</dt><dd>2026-07-10</dd>
+            <dt>Source</dt><dd><code>Docs/agent-plans/active/2026-07-10-raw/raw.md</code></dd>
+            <dt>Library</dt><dd>LibRAW 0.22.1 (vendored universal static lib, <code>x86_64</code> + <code>arm64</code>)</dd>
+            <dt>Targets</dt><dd>Xcode project <code>SwiftRAW.xcodeproj</code> &amp; Swift package <code>Package.swift</code> (kept in sync)</dd>
+        </dl>
+    </div>
+
+    <h2>Overview</h2>
+    <p>
+        The goal is to build <strong>SwiftRAW</strong>, a Swift library that reads camera RAW files by wrapping
+        <a href="https://www.libraw.org">LibRAW</a>. The wrapper exposes RAW files through a clean, Swift-native,
+        <strong>read-only</strong> API — structured metadata (camera / lens identification, exposure, image geometry,
+        color data, GPS / timestamp) plus access to the unpacked raw sensor (Bayer) buffer. It intentionally does
+        <em>not</em> demosaic to RGB or extract thumbnails, mirroring the read-only nature of the author's
+        <a href="https://github.com/macmade/SwiftFITS.git">SwiftFITS</a> and
+        <a href="https://github.com/macmade/SwiftXISF.git">SwiftXISF</a> libraries.
+    </p>
+    <p>
+        LibRAW is a C++ library. Per the source document, Swift will talk to it <strong>directly through C++ interop</strong>:
+        a Clang module exposes the C++ <code>LibRaw</code> class, and the Swift layer drives its lifecycle
+        (<code>open_file</code> / <code>unpack</code> / <code>recycle</code>) and reads structured data off its
+        <code>imgdata</code> member. The plan follows the reference projects' architecture and conventions as closely as
+        applicable: a core <code>RAWFile</code> reference type, a <code>RAWError</code> enum, one type per file organized
+        into subfolders, exhaustive SwiftDoc comments, and a broad Swift Testing suite that discovers fixture files at
+        the repository root. Both the Xcode project and the SwiftPM manifest must build and test green, matching the
+        existing CI matrix.
+    </p>
+
+    <h2>Questions &amp; answers</h2>
+    <div class="qa">
+        <p class="q">Q1 — How should the Swift layer bind to LibRAW under the hood?</p>
+        <p class="a"><strong>The C++ <code>LibRaw</code> class via Swift/C++ interop.</strong> Drive lifecycle through the
+            C++ class and read metadata off its <code>imgdata</code> member, matching the stated goal of "using C++
+            directly from Swift." The plain-C <code>libraw_*</code> functions remain available as a fallback for spots
+            where interop is awkward, but the C++ class is the primary binding surface.</p>
+
+        <p class="q">Q2 — What should the wrapper's public API expose?</p>
+        <p class="a"><strong>Metadata + raw sensor data only.</strong> Open / unpack a RAW file and expose structured
+            metadata (camera &amp; lens, exposure, sizes, CFA pattern, color data, GPS / timestamp) plus access to the
+            raw Bayer / sensor buffer. No demosaicing to RGB, no thumbnail extraction — the closest analog to the
+            read-only reference parsers.</p>
+
+        <p class="q">Q3 — How should the test suite obtain RAW fixture files?</p>
+        <p class="a"><strong>Real RAW samples, provided on demand.</strong> Mirror SwiftXISF: a <code>Test Files/</code>
+            directory at the repository root, discovered via <code>#filePath</code> under SwiftPM and via the test
+            bundle under Xcode. The user will supply real samples (e.g. <code>.CR2</code> / <code>.NEF</code> /
+            <code>.ARW</code> / <code>.DNG</code>); the suite is structured to test broadly against them.</p>
+
+        <p class="q">Q4 — How should the Swift package link the vendored LibRAW static library?</p>
+        <p class="a"><strong>Recommended: system-library Clang module + linker <code>unsafeFlags</code></strong> (see
+            Notes → <em>SPM linkage decision</em>). This reuses the universal <code>.a</code> already committed to the
+            repo, matches how the Xcode target already links, and its only real caveat — consumers must depend via a
+            branch / revision rather than a versioned tag — is already how SwiftFITS and SwiftXISF are consumed. An
+            xcframework binary target is recorded as an alternative if versioned consumption later becomes a
+            requirement.</p>
+    </div>
+
+    <h2>Notes</h2>
+
+    <h4>Current state of the repository</h4>
+    <ul>
+        <li>The <strong>Xcode target is already wired</strong> for LibRAW: <code>HEADER_SEARCH_PATHS = LibRAW/include</code>,
+            <code>LIBRARY_SEARCH_PATHS = LibRAW/lib</code>, <code>OTHER_LDFLAGS = -lraw_r</code>, and
+            <code>SWIFT_OBJC_INTEROP_MODE = objcxx</code> (C++ interop enabled). What is missing is a <strong>Clang module
+            map</strong> so Swift can <code>import</code> LibRAW.</li>
+        <li>The <strong>SwiftPM manifest has no LibRAW wiring at all</strong> — no module, no C++ interop mode, no linkage.
+            This is the largest build-system gap and is addressed first (Milestone 1).</li>
+        <li>Source scaffolding is a single empty <code>SwiftRAW/SwiftRAW.swift</code> and a placeholder test. Both will be
+            replaced by the subfolder-organized structure below.</li>
+        <li>Both <code>.a</code> variants are universal (<code>x86_64</code> + <code>arm64</code>). Use the thread-safe
+            <code>libraw_r</code> variant (already referenced by <code>OTHER_LDFLAGS</code>).</li>
+        <li>CI (<code>.github/workflows/ci-mac.yaml</code>) already builds both the Xcode project (Debug test + Release
+            build) and SwiftPM (<code>swift build</code> / <code>swift test</code>, debug + release). Every milestone must
+            keep both paths green.</li>
+    </ul>
+
+    <h4>Conventions to follow (from SwiftFITS / SwiftXISF and the global working agreement)</h4>
+    <ul>
+        <li>MIT license header block at the top of every source file (2026 copyright), as in the existing files.</li>
+        <li>One public type per file; organize into subfolders (proposed: <code>Core/</code>, <code>Image/</code>,
+            <code>Metadata/</code>, <code>Color/</code>, <code>Lens/</code>, <code>Extensions/</code>).</li>
+        <li>A <code>RAWError</code> enum conforming to <code>LocalizedError</code>, <code>CustomStringConvertible</code>,
+            <code>Sendable</code>, with a <code>"RAW Error: …"</code>-style description — mirroring <code>XISFError</code>.</li>
+        <li>Explicit <code>public</code>; <code>let</code> over <code>var</code>; no force-unwrap; early returns; prefer
+            <code>map</code>/<code>filter</code>/<code>forEach</code> over raw loops; aligned <code>=</code>; blank line
+            between calls and assignments.</li>
+        <li>Full SwiftDoc comments on all members, <strong>including private ones</strong>.</li>
+        <li>Tests use <strong>Swift Testing</strong> (<code>import Testing</code>, <code>@Test</code>, <code>#expect</code>,
+            <code>#require</code>), with a test-only <code>TestError</code> and a <code>TestUtilities</code> fixture
+            discoverer that mirrors SwiftXISF's <code>#filePath</code> / bundle split.</li>
+        <li>The Xcode project and <code>Package.swift</code> are maintained together and kept in sync at every step;
+            prefer <code>xcodebuild</code> for building/testing, but keep <code>swift build</code>/<code>swift test</code>
+            working too.</li>
+        <li>Do not reference absolute paths to SwiftFITS / SwiftXISF anywhere in the produced code or docs.</li>
+    </ul>
+
+    <h4>C++ interop specifics</h4>
+    <ul>
+        <li><code>libraw.h</code> is C++ and pulls in <code>&lt;limits.h&gt;</code>, <code>&lt;memory.h&gt;</code>, etc.,
+            then declares both the <code>extern "C"</code> API and the <code>class LibRaw</code>. The module map must mark
+            the module <code>requires cplusplus</code>.</li>
+        <li>Xcode uses <code>SWIFT_OBJC_INTEROP_MODE = objcxx</code>; SwiftPM needs the equivalent
+            <code>.interoperabilityMode(.Cxx)</code> Swift setting on the <code>SwiftRAW</code> target. Both must agree.</li>
+        <li>Interop risk areas to validate early: importing a class with virtual methods and non-trivial construction,
+            reading nested C structs off <code>imgdata</code>, and mapping <code>char[]</code> fields / C strings to Swift
+            <code>String</code>. Where the C++ class is awkward, the flat <code>libraw_*</code> C functions are an
+            acceptable fallback.</li>
+        <li>The <code>LibRaw</code> instance owns heap buffers; the Swift wrapper must keep it alive for as long as any
+            exposed raw-buffer view is in use, and call <code>recycle()</code> on <code>deinit</code>. The wrapper is a
+            reference type and is <strong>not</strong> <code>Sendable</code> (same stance as <code>FITSFile</code> /
+            <code>XISFFile</code>).</li>
+    </ul>
+
+    <h4>SPM linkage decision (recommendation for Q4)</h4>
+    <div class="note-callout">
+        Use a <strong>system-library Clang module</strong> (a shared <code>module.modulemap</code> that both Xcode and
+        SwiftPM consume) plus <strong>linker <code>unsafeFlags</code></strong> (<code>-L LibRAW/lib -lraw_r</code>) and
+        header include flags on the <code>SwiftRAW</code> target. Rationale: it reuses the committed universal
+        <code>.a</code>, matches the Xcode target's existing linkage, and requires no repackaging. The one caveat —
+        <code>unsafeFlags</code> prevents consumption via a versioned tag, so dependents must use
+        <code>branch:</code>/<code>revision:</code> — is already the distribution model for SwiftFITS/SwiftXISF. If
+        clean versioned consumption is needed later, repackage LibRAW as an <code>xcframework</code> binary target; that
+        alternative is deferred, not chosen. The exact module-map placement and search-path wiring is finalized and
+        verified in Milestone 1.
+    </div>
+
+    <h4>Dependencies &amp; risks</h4>
+    <ul>
+        <li><strong>Test fixtures are user-supplied.</strong> Milestones that assert on real metadata / buffers cannot be
+            fully validated until sample RAW files are provided. The fixture-discovery mechanism and error-path tests are
+            built regardless so the suite is runnable from the start.</li>
+        <li><strong>Maker-note breadth.</strong> LibRAW exposes very large, camera-specific maker-note structs. Scope keeps
+            a curated, cross-vendor subset (identification, exposure, lens, color, GPS); exhaustive per-vendor maker notes
+            are out of scope unless requested. Flagged in Milestone 5.</li>
+        <li><strong>C++ interop maturity.</strong> If a specific construct fails to import, fall back to the C API for that
+            call. Surface any blocker early rather than guessing.</li>
+    </ul>
+
+    <h2>Milestones</h2>
+
+    <div class="phase-label">Phase 1 · Build-system foundation</div>
+
+    <div class="milestone">
+        <h3><span class="num">M1.</span> Expose LibRAW as a Clang C++ module (Xcode + SwiftPM) <span class="status completed">Completed</span></h3>
+        <p><strong>Goal:</strong> Make <code>import libraw</code> work from Swift in <em>both</em> the Xcode target and the
+            Swift package, with C++ interop enabled, so the rest of the work has a solid foundation. This is the critical
+            enabling milestone.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li>Author a <code>module.modulemap</code> for LibRAW (module <code>libraw</code>, header
+                    <code>libraw/libraw.h</code>, <code>requires cplusplus</code>, <code>link "raw_r"</code>); decide and
+                    document its location under <code>LibRAW/</code>.</li>
+                <li>Wire the module into the Xcode project so Swift finds the module map (e.g. via
+                    <code>SWIFT_INCLUDE_PATHS</code> / <code>-fmodule-map-file</code>), keeping the existing header/library
+                    search paths and <code>SWIFT_OBJC_INTEROP_MODE = objcxx</code>.</li>
+                <li>Add SwiftPM wiring in <code>Package.swift</code>: a <code>.systemLibrary</code> target for the module,
+                    <code>.interoperabilityMode(.Cxx)</code> on the <code>SwiftRAW</code> target, and linker/header
+                    <code>unsafeFlags</code> (<code>-L LibRAW/lib -lraw_r</code>, include path). Keep the manifest in sync
+                    with the Xcode setup.</li>
+                <li>Add a minimal smoke test (Swift code that calls <code>libraw_version()</code> and constructs a
+                    <code>LibRaw</code> instance) to prove the module imports and links.</li>
+                <li>Verify: <code>xcodebuild</code> (Debug test + Release build) <em>and</em>
+                    <code>swift build</code> / <code>swift test</code> both succeed on a clean checkout.</li>
+                <li>Record the final SPM linkage decision (Q4) and the module-map placement in the plan.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <p>Implemented test-first (TDD): the smoke tests were written against <code>import libraw</code>, watched to fail with &ldquo;no such module&rdquo;, then the build systems were wired until green.</p>
+            <ul>
+                <li><strong>Module map</strong> at <code>LibRAW/include/module.modulemap</code> (module <code>libraw</code>, <code>header "libraw/libraw.h"</code>, <code>requires cplusplus</code>). Placed alongside the headers so a single include path (<code>LibRAW/include</code>) serves both Swift module lookup and C++ header resolution in both build systems.</li>
+                <li><strong>zlib is a hard dependency:</strong> LibRAW references <code>_uncompress</code> (DNG deflate), so the module autolinks both <code>raw_r</code> and <code>z</code>. The pre-existing Xcode <code>OTHER_LDFLAGS = -lraw_r</code> alone would have failed to link; <code>-lz</code> was added.</li>
+                <li><strong>Xcode:</strong> added <code>SWIFT_INCLUDE_PATHS = $(PROJECT_DIR)/LibRAW/include</code> and <code>-lz</code> to the framework target; kept <code>HEADER_SEARCH_PATHS</code> / <code>LIBRARY_SEARCH_PATHS</code> / <code>SWIFT_OBJC_INTEROP_MODE = objcxx</code>. The <strong>test target</strong> also needed the LibRAW module path + <code>objcxx</code> interop + library search path, because <code>@testable import SwiftRAW</code> transitively loads the <code>libraw</code> module. Added <code>SwiftRAW/Core/LibRAWVersion.swift</code> to the project under a new <code>Core</code> group.</li>
+                <li><strong>SwiftPM:</strong> added a <code>.systemLibrary(name: "libraw", path: "LibRAW/include")</code> target, <code>.interoperabilityMode(.Cxx)</code> on the <code>SwiftRAW</code> and test targets, and a <code>-L LibRAW/lib</code> linker flag. No <code>platforms</code> declaration (per review feedback &mdash; SwiftPM uses its default macOS floor).</li>
+                <li><strong>Consumer confinement:</strong> <code>internal import libraw</code> keeps the C module out of SwiftRAW's public interface, so real (non-<code>@testable</code>) consumers need no LibRAW module/search-path configuration.</li>
+                <li><strong>Smoke API:</strong> public <code>LibRAWVersion.string</code> / <code>.number</code> read via the C++ static methods <code>LibRaw::version()</code> / <code>versionNumber()</code>; an internal <code>canCreateLibRAWContext()</code> creates and frees a LibRAW instance via the heap C API.</li>
+            </ul>
+            <p><strong>Key interop finding:</strong> constructing the C++ <code>LibRaw</code> class as a Swift <em>value</em> (<code>LibRaw(0)</code>) crashes at runtime (SIGSEGV/SIGBUS). <code>LibRaw</code> is a large, self-referential object (its constructor stores pointers into its own members); Swift relocates values with a bitwise move, dangling those self-pointers. The smoke test therefore instantiates via the heap-based C API (<code>libraw_init</code> / <code>libraw_close</code>) &mdash; the Q1 fallback for awkward interop. <strong>This shapes M2:</strong> <code>RAWFile</code> cannot hold <code>LibRaw</code> as a Swift value member; it must keep the instance on the heap (C API context, or a C++ shim).</p>
+            <p><strong>Verification (all green):</strong> <code>swift build</code> / <code>swift test</code> debug + release (3/3 tests), and <code>xcodebuild</code> Debug test (3/3) + Release build. Independently reproduced by the automated reviewer, including under Xcode's <code>-warnings-as-errors</code>.</p>
+            <p><strong>Automated review loop:</strong> 1 round; converged. No Critical/High findings and no code defects; the single Medium finding is the deliberate, plan-ratified Q4 trade-off (see Automated review).</p>
+            <p><strong>Post-review changes (human feedback):</strong> removed the <code>platforms</code> declaration from <code>Package.swift</code>; set the Xcode deployment target to macOS 15.0 (<code>MACOSX_DEPLOYMENT_TARGET = 15.0</code>, previously 15.6). All four CI paths re-verified green after the change.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>One fresh-context review round; converged (no defects requiring a code change).</p>
+            <ul>
+                <li><strong>[Medium] <code>.unsafeFlags</code> blocks versioned SwiftPM consumption</strong> &mdash; the <code>-L</code> linker <code>unsafeFlags</code> on the <code>SwiftRAW</code> target prevent consuming the package via a versioned tag; consumers must use <code>branch:</code> / <code>revision:</code>. <em>Resolution: Deferred / acknowledged.</em> This is exactly the Q4 decision already ratified in the plan (the same model as SwiftFITS/SwiftXISF); the xcframework alternative is explicitly deferred. Surfaced to the user rather than re-architected &mdash; no code change.</li>
+                <li><strong>[Low] Relative <code>-L LibRAW/lib</code> is cwd-dependent</strong> &mdash; resolves against the linker's working directory; works from the package root (as CI runs) but could fail from another cwd. Xcode uses the absolute <code>$(PROJECT_DIR)</code>. <em>Resolution: Deferred</em> (surfaced for the user; matches the reference projects' relative-path model).</li>
+                <li><strong>[Info] Xcode target config asymmetry</strong> &mdash; the framework target sets explicit <code>OTHER_LDFLAGS</code> while the test target relies on module-map autolink; both build correctly. <em>Resolution: Deferred.</em></li>
+                <li><strong>[Info] Vendored <code>libraw_r.a</code> min-version link warnings</strong> &mdash; objects built for macOS 26.0 linked against 15.6 emit benign <code>ld</code> warnings on every build. Property of the vendored binary. <em>Resolution: Deferred.</em></li>
+            </ul>
+            <p>The reviewer also confirmed conventions (MIT header, one type per file in <code>Core/</code>, full SwiftDoc, no force-unwrap, early returns), pbxproj internal consistency, deployment-target and interop-mode parity between the two build systems, and no regressions.</p>
+        </div>
+        <div class="field"><div class="field-label">Review comments</div>
+            <ul>
+                <li>Do not add <code>platforms</code> to <code>Package.swift</code>.</li>
+                <li>In the Xcode project, set the deployment target to macOS 15.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="phase-label">Phase 2 · Core lifecycle &amp; error model</div>
+
+    <div class="milestone">
+        <h3><span class="num">M2.</span> <code>RAWError</code>, <code>RAWFile</code> lifecycle &amp; open/unpack <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Establish the core reference type and error model: open a RAW file from a URL or in-memory
+            data, unpack it, map LibRAW status codes to Swift errors, and manage the <code>LibRaw</code> instance's
+            lifetime safely.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li>Define <code>RAWError</code> (<code>LocalizedError</code>, <code>CustomStringConvertible</code>,
+                    <code>Sendable</code>) covering <code>invalidFileURL</code>, <code>cannotReadFile</code>,
+                    <code>openFailed</code>, <code>unpackFailed</code>, <code>unsupportedFormat</code>, and a generic
+                    LibRAW-code-carrying case, with a <code>"RAW Error: …"</code> description.</li>
+                <li>Map LibRAW return codes (<code>LIBRAW_SUCCESS</code>, <code>LIBRAW_IO_ERROR</code>,
+                    <code>LIBRAW_FILE_UNSUPPORTED</code>, <code>LIBRAW_UNSUFFICIENT_MEMORY</code>, …) to
+                    <code>RAWError</code>, using <code>libraw_strerror</code> for messages.</li>
+                <li>Implement <code>RAWFile</code> as a <code>public class</code>: <code>init(url:options:)</code> and
+                    <code>init(data:options:)</code>, owning a <code>LibRaw</code>, driving <code>open_file</code> /
+                    <code>open_buffer</code> and <code>unpack</code>; <code>recycle()</code> on <code>deinit</code>.</li>
+                <li>Add a <code>RAWParsingOptions</code> type analogous to <code>FITSParsingOptions</code> /
+                    <code>XISFParsingOptions</code> (e.g. eager vs. lazy unpack; any LibRAW open flags worth surfacing).
+                    Keep it minimal for the read-only scope.</li>
+                <li>Conform <code>RAWFile</code> to <code>CustomStringConvertible</code> (basic summary for now).</li>
+                <li>Set up <code>TestUtilities</code> (fixture discovery via <code>#filePath</code> / bundle) and
+                    <code>TestError</code>; add tests for open success, invalid URL, unreadable data, and unsupported /
+                    corrupt input error mapping.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <div class="phase-label">Phase 3 · Structured metadata</div>
+
+    <div class="milestone">
+        <h3><span class="num">M3.</span> Image geometry &amp; identification (<code>sizes</code> + <code>iparams</code>) <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Expose the image geometry and camera identification that describe the sensor layout —
+            the foundation every other consumer needs.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li><code>RAWImageSizes</code> from <code>libraw_image_sizes_t</code> (raw width/height, output width/height,
+                    top/left margins, <code>iwidth</code>/<code>iheight</code>, pixel aspect, flip, raw pitch).</li>
+                <li><code>RAWImageInfo</code> / identification from <code>libraw_iparams_t</code> (make, model, software,
+                    normalized make/model, colors, <code>filters</code>, <code>cdesc</code>, raw count, DNG version).</li>
+                <li>A CFA / Bayer pattern helper deriving the color-filter layout from <code>filters</code> /
+                    <code>xtrans</code> (and exposing a per-pixel color lookup equivalent to <code>COLOR(row,col)</code>).</li>
+                <li>Expose these off <code>RAWFile</code> as computed/stored properties.</li>
+                <li>Tests: field presence and sane values on provided samples; CFA-pattern correctness on a known Bayer
+                    sample.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <div class="milestone">
+        <h3><span class="num">M4.</span> Exposure, shot &amp; color metadata (<code>imgother</code> + <code>colordata</code>) <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Surface the exposure/shot metadata a photographer expects, plus the color calibration
+            data used to interpret the raw samples.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li><code>RAWShotInfo</code> from <code>libraw_imgother_t</code> (ISO, shutter, aperture, focal length,
+                    timestamp, shot order, description, artist) and shooting info from
+                    <code>libraw_shootinginfo_t</code> where useful.</li>
+                <li><code>RAWGPSInfo</code> from <code>libraw_gps_info_t</code> (lat/long/alt and references), exposed when
+                    present.</li>
+                <li><code>RAWColorData</code> from <code>libraw_colordata_t</code> (black / <code>cblack</code>, maximum /
+                    <code>data_maximum</code>, <code>cam_mul</code>, <code>pre_mul</code>, <code>rgb_cam</code>,
+                    <code>cam_xyz</code>, white-balance and color matrices, embedded profile availability).</li>
+                <li>Map fixed-size C arrays to Swift arrays/tuples cleanly; convert <code>char[]</code> fields to
+                    <code>String</code> via an extension helper.</li>
+                <li>Tests: exposure values and color-multiplier arrays on provided samples; graceful handling when GPS /
+                    profile data is absent.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <div class="milestone">
+        <h3><span class="num">M5.</span> Lens metadata (<code>lensinfo</code>) &amp; maker-note scope <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Expose lens identification and settle the maker-note scope boundary explicitly.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li><code>RAWLensInfo</code> from <code>libraw_lensinfo_t</code> (min/max focal, aperture, lens make /
+                    model / serial, and the <code>MakerNotes</code> / DNG lens substructures worth surfacing).</li>
+                <li>Expose a curated, cross-vendor subset of common maker-note fields (<code>libraw_makernotes_lens_t</code>,
+                    <code>libraw_metadata_common_t</code>) rather than the full per-camera structs.</li>
+                <li>Document in the plan and in code what maker-note data is intentionally out of scope, and confirm the
+                    boundary before implementing (per the working agreement's "ask before big moves").</li>
+                <li>Tests: lens fields on samples that carry lens metadata; absent-lens graceful handling.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <div class="phase-label">Phase 4 · Raw sensor data</div>
+
+    <div class="milestone">
+        <h3><span class="num">M6.</span> Raw sensor buffer access (<code>rawdata</code>) <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Give safe Swift access to the unpacked raw sensor samples — the core payload of the
+            "metadata + raw sensor data" scope.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li>After <code>unpack</code>, expose the raw buffer(s) from <code>libraw_rawdata_t</code> — primarily the
+                    16-bit Bayer <code>raw_image</code>, with the 3-/4-component and float variants surfaced where
+                    present — together with geometry (raw width/height/pitch).</li>
+                <li>Provide safe accessors (e.g. a copy into <code>[UInt16]</code>/<code>Data</code>, and/or a
+                    <code>withUnsafeBufferPointer</code>-style view whose lifetime is clearly tied to the
+                    <code>RAWFile</code>), and document the memory-lifetime contract.</li>
+                <li>Handle the not-yet-unpacked and no-raw-buffer cases with clear errors/optionals.</li>
+                <li>Tests: buffer dimensions match the sizes metadata; buffer is non-empty and sample values are within the
+                    declared maximum on provided samples.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <div class="phase-label">Phase 5 · Polish, docs &amp; release readiness</div>
+
+    <div class="milestone">
+        <h3><span class="num">M7.</span> Extensions, descriptions &amp; API/test audit <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Round out ergonomics and consistency, and broaden the test suite to reference-project
+            breadth.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li>Add <code>Extensions/</code> helpers as needed (e.g. C <code>char[]</code> / <code>const char*</code>
+                    → <code>String</code>, small <code>Data</code> conveniences), mirroring the reference repos.</li>
+                <li>Give the metadata types <code>CustomStringConvertible</code> descriptions and a rich
+                    <code>RAWFile.description</code> summarizing key metadata (analogous to SwiftXISF's
+                    <code>Descriptions</code> tests).</li>
+                <li>API audit against conventions: explicit <code>public</code>, one type per file in subfolders,
+                    <code>let</code> over <code>var</code>, no force-unwrap, no raw loops, full SwiftDoc on public and
+                    private members.</li>
+                <li>Broaden tests: a descriptions test, <code>hasTestFiles</code>-style fixture assertions, and coverage
+                    across multiple camera makes among the provided samples.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <div class="milestone">
+        <h3><span class="num">M8.</span> README, final sync &amp; green-build verification <span class="status not-started">Not started</span></h3>
+        <p><strong>Goal:</strong> Ship-ready documentation and a verified, fully in-sync Xcode + SwiftPM build matching CI.</p>
+        <div class="field">
+            <div class="field-label">Tasks</div>
+            <ul class="tasks">
+                <li>Rewrite <code>README.md</code> modeled on SwiftFITS / SwiftXISF: badges, About, read-only Status,
+                    Requirements (note LibRAW 0.22.1, C++ interop, the vendored universal static lib), Conformance /
+                    Limitations, SwiftPM consumption (via <code>branch:</code>), <code>--recursive</code> cloning note, and
+                    an example usage snippet — no absolute paths to the reference repos.</li>
+                <li>Confirm every public and private type/member carries a SwiftDoc comment.</li>
+                <li>Verify the Xcode project and <code>Package.swift</code> are fully in sync (targets, sources, module,
+                    interop, linkage).</li>
+                <li>Run the full CI-equivalent locally: <code>xcodebuild</code> Debug (test) + Release (build), and
+                    <code>swift build</code> / <code>swift test</code> in debug + release — all green.</li>
+                <li>Confirm the plan's per-milestone status is up to date; hand off for the move to
+                    <code>Docs/agent-plans/completed</code> at the user's discretion.</li>
+            </ul>
+        </div>
+        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
+        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
+        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
+        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
+    </div>
+
+    <h2>Appendix</h2>
+
+    <h4>Proposed source layout</h4>
+    <pre><code>SwiftRAW/
+  Core/
+    RAWError.swift
+    RAWFile.swift
+    RAWParsingOptions.swift
+  Image/
+    RAWImageSizes.swift
+    RAWImageInfo.swift
+    RAWCFAPattern.swift
+    RAWSensorData.swift
+  Metadata/
+    RAWShotInfo.swift
+    RAWGPSInfo.swift
+  Color/
+    RAWColorData.swift
+  Lens/
+    RAWLensInfo.swift
+  Extensions/
+    String.swift
+    Data.swift
+
+SwiftRAWTests/
+  TestUtilities.swift
+  TestError.swift
+  Core/ … Image/ … Metadata/ … Color/ … Lens/ …   (mirrors the target)
+
+LibRAW/
+  include/libraw/*.h
+  lib/libraw_r.a, libraw.a
+  module.modulemap            (added in M1; exact placement finalized there)
+
+Test Files/                   (user-provided RAW samples, discovered at repo root)
+  Canon/ Nikon/ Sony/ Adobe/ …</code></pre>
+
+    <h4>Key LibRAW data structures referenced (from <code>libraw_types.h</code>, v0.22.1)</h4>
+    <ul>
+        <li><code>libraw_data_t</code> — top-level container (the <code>LibRaw::imgdata</code> member).</li>
+        <li><code>libraw_image_sizes_t</code>, <code>libraw_iparams_t</code> — geometry &amp; identification (M3).</li>
+        <li><code>libraw_imgother_t</code>, <code>libraw_gps_info_t</code>, <code>libraw_colordata_t</code>,
+            <code>libraw_shootinginfo_t</code> — exposure / GPS / color (M4).</li>
+        <li><code>libraw_lensinfo_t</code>, <code>libraw_makernotes_lens_t</code>,
+            <code>libraw_metadata_common_t</code> — lens &amp; curated maker notes (M5).</li>
+        <li><code>libraw_rawdata_t</code> — unpacked raw sensor buffers (M6).</li>
+    </ul>
+
+    <h4>LibRAW reference documentation</h4>
+    <ul>
+        <li><a href="https://www.libraw.org/docs/API-overview.html">API Overview (C++)</a></li>
+        <li><a href="https://www.libraw.org/docs/API-datastruct-eng.html">Data Structures and Constants</a></li>
+        <li><a href="https://www.libraw.org/docs/API-CXX.html">C++ API</a></li>
+        <li><a href="https://www.libraw.org/docs/API-C.html">C API</a></li>
+        <li><a href="https://www.libraw.org/docs/API-notes.html">General Notes on API</a></li>
+        <li><a href="https://www.libraw.org/docs/Samples-LibRaw.html">Usage Examples</a></li>
+        <li><a href="https://www.swift.org/documentation/cxx-interop/#enabling-c-interoperability">Swift ↔ C++ interoperability</a></li>
+    </ul>
+
+    <hr>
+    <p><small>SwiftRAW implementation plan · generated 2026-07-10 · living document — milestone fields are updated in place during implementation.</small></p>
+
+</div>

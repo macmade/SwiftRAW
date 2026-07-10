@@ -1,0 +1,22 @@
+// Clang module map exposing the vendored LibRAW C++ library to Swift.
+//
+// LibRAW's primary interface is the C++ `LibRaw` class, so the module requires
+// C++ (`requires cplusplus`) and is imported with Swift/C++ interoperability
+// enabled. It autolinks the thread-safe `raw_r` static library and zlib, which
+// LibRAW depends on for DNG deflate decoding.
+//
+// The module map lives alongside LibRAW's headers so a single include path
+// (`LibRAW/include`) serves both the Swift module lookup and the C++ header
+// resolution, and is consumed identically by the Xcode project (via
+// `SWIFT_INCLUDE_PATHS`) and the Swift package (via a `systemLibrary` target).
+module libraw
+{
+    header "libraw/libraw.h"
+
+    requires cplusplus
+
+    link "raw_r"
+    link "z"
+
+    export *
+}
