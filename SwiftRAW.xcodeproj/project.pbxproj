@@ -16,6 +16,7 @@
 		056AD0022FFFE70900F40080 /* RAWImageSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0012FFFE70900F40080 /* RAWImageSizes.swift */; };
 		056AD0042FFFE70900F40080 /* RAWImageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0032FFFE70900F40080 /* RAWImageInfo.swift */; };
 		056AD0062FFFE70900F40080 /* RAWCFAPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */; };
+		056AD0332FFFE70900F40080 /* RAWSensorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0322FFFE70900F40080 /* RAWSensorData.swift */; };
 		056AD0092FFFE70900F40080 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0082FFFE70900F40080 /* String.swift */; };
 		056AD0102FFFE70900F40080 /* CFixedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00F2FFFE70900F40080 /* CFixedArray.swift */; };
 		056AD0132FFFE70900F40080 /* RAWShotInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0122FFFE70900F40080 /* RAWShotInfo.swift */; };
@@ -32,6 +33,7 @@
 		056ACFEC2FFFE70B00F40080 /* RAWErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056ACFEB2FFFE70B00F40080 /* RAWErrorTests.swift */; };
 		056AD00C2FFFE70B00F40080 /* RAWCFAPatternTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */; };
 		056AD00E2FFFE70B00F40080 /* RAWImageMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */; };
+		056AD0352FFFE70B00F40080 /* RAWSensorDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0342FFFE70B00F40080 /* RAWSensorDataTests.swift */; };
 		056AD01B2FFFE70B00F40080 /* CFixedArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD01A2FFFE70B00F40080 /* CFixedArrayTests.swift */; };
 		056AD01E2FFFE70B00F40080 /* RAWGPSInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD01D2FFFE70B00F40080 /* RAWGPSInfoTests.swift */; };
 		056AD0202FFFE70B00F40080 /* RAWShotInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD01F2FFFE70B00F40080 /* RAWShotInfoTests.swift */; };
@@ -110,6 +112,7 @@
 		056AD0012FFFE70900F40080 /* RAWImageSizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageSizes.swift; sourceTree = "<group>"; };
 		056AD0032FFFE70900F40080 /* RAWImageInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageInfo.swift; sourceTree = "<group>"; };
 		056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWCFAPattern.swift; sourceTree = "<group>"; };
+		056AD0322FFFE70900F40080 /* RAWSensorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWSensorData.swift; sourceTree = "<group>"; };
 		056AD0082FFFE70900F40080 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		056AD00F2FFFE70900F40080 /* CFixedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFixedArray.swift; sourceTree = "<group>"; };
 		056AD0122FFFE70900F40080 /* RAWShotInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWShotInfo.swift; sourceTree = "<group>"; };
@@ -125,6 +128,7 @@
 		056ACFEB2FFFE70B00F40080 /* RAWErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWErrorTests.swift; sourceTree = "<group>"; };
 		056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWCFAPatternTests.swift; sourceTree = "<group>"; };
 		056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageMetadataTests.swift; sourceTree = "<group>"; };
+		056AD0342FFFE70B00F40080 /* RAWSensorDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWSensorDataTests.swift; sourceTree = "<group>"; };
 		056AD01A2FFFE70B00F40080 /* CFixedArrayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFixedArrayTests.swift; sourceTree = "<group>"; };
 		056AD01D2FFFE70B00F40080 /* RAWGPSInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWGPSInfoTests.swift; sourceTree = "<group>"; };
 		056AD01F2FFFE70B00F40080 /* RAWShotInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWShotInfoTests.swift; sourceTree = "<group>"; };
@@ -349,6 +353,7 @@
 				056AD0012FFFE70900F40080 /* RAWImageSizes.swift */,
 				056AD0032FFFE70900F40080 /* RAWImageInfo.swift */,
 				056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */,
+				056AD0322FFFE70900F40080 /* RAWSensorData.swift */,
 			);
 			path = Image;
 			sourceTree = "<group>";
@@ -428,6 +433,7 @@
 			children = (
 				056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */,
 				056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */,
+				056AD0342FFFE70B00F40080 /* RAWSensorDataTests.swift */,
 			);
 			path = Image;
 			sourceTree = "<group>";
@@ -561,6 +567,7 @@
 				056AD0022FFFE70900F40080 /* RAWImageSizes.swift in Sources */,
 				056AD0042FFFE70900F40080 /* RAWImageInfo.swift in Sources */,
 				056AD0062FFFE70900F40080 /* RAWCFAPattern.swift in Sources */,
+				056AD0332FFFE70900F40080 /* RAWSensorData.swift in Sources */,
 				056AD0092FFFE70900F40080 /* String.swift in Sources */,
 				056AD0102FFFE70900F40080 /* CFixedArray.swift in Sources */,
 				056AD0132FFFE70900F40080 /* RAWShotInfo.swift in Sources */,
@@ -585,6 +592,7 @@
 				056ACFEC2FFFE70B00F40080 /* RAWErrorTests.swift in Sources */,
 				056AD00C2FFFE70B00F40080 /* RAWCFAPatternTests.swift in Sources */,
 				056AD00E2FFFE70B00F40080 /* RAWImageMetadataTests.swift in Sources */,
+				056AD0352FFFE70B00F40080 /* RAWSensorDataTests.swift in Sources */,
 				056AD01B2FFFE70B00F40080 /* CFixedArrayTests.swift in Sources */,
 				056AD01E2FFFE70B00F40080 /* RAWGPSInfoTests.swift in Sources */,
 				056AD0202FFFE70B00F40080 /* RAWShotInfoTests.swift in Sources */,

@@ -266,6 +266,65 @@ public final class RAWFile: CustomStringConvertible
         RAWCameraMetadata( from: self.raw.pointee.imgdata.makernotes.common )
     }
 
+    /// A description of the unpacked raw sensor buffer: its geometry and which
+    /// in-memory layout LibRAW produced.
+    ///
+    /// Before ``unpack()`` runs, ``RAWSensorData/layout`` is ``RAWSensorData/Layout/none``.
+    public var sensorData: RAWSensorData
+    {
+        let sizes = self.raw.pointee.imgdata.sizes
+
+        return withUnsafePointer( to: &self.raw.pointee.imgdata.rawdata )
+        {
+            RAWSensorData( from: $0, sizes: sizes )
+        }
+    }
+
+    /// A copy of the unpacked 16-bit single-channel Bayer buffer, or `nil` when
+    /// it is unavailable (the file has not been unpacked, or the decoder
+    /// produced a different layout — see ``sensorData``).
+    ///
+    /// The returned array is owned by the caller and outlives the file. For
+    /// large buffers, ``withRawImage(_:)`` avoids the copy.
+    public var rawImage: [ UInt16 ]?
+    {
+        self.withRawImage
+        {
+            Array( $0 )
+        }
+    }
+
+    /// Provides temporary, zero-copy access to the unpacked 16-bit Bayer buffer.
+    ///
+    /// The buffer passed to `body` points directly into memory owned by LibRAW,
+    /// and is valid **only** for the duration of the call. Do not let the
+    /// pointer (or the buffer) escape `body`: it is tied to this ``RAWFile``'s
+    /// lifetime and becomes invalid once the file is released or re-unpacked.
+    ///
+    /// The buffer spans `raw_height × (raw_pitch / 2)` samples, matching the
+    /// geometry in ``sensorData``.
+    ///
+    /// - Parameter body: A closure receiving the raw sample buffer.
+    ///
+    /// - Returns: The value returned by `body`, or `nil` if no 16-bit Bayer
+    ///   buffer is available.
+    public func withRawImage< R >( _ body: ( UnsafeBufferPointer< UInt16 > ) throws -> R ) rethrows -> R?
+    {
+        let sizes  = self.raw.pointee.imgdata.sizes
+        let height = Int( sizes.raw_height )
+        let pitch  = Int( sizes.raw_pitch )
+
+        guard let base = self.raw.pointee.imgdata.rawdata.raw_image, height > 0, pitch > 0
+        else
+        {
+            return nil
+        }
+
+        let buffer = UnsafeBufferPointer( start: base, count: height * ( pitch / 2 ) )
+
+        return try body( buffer )
+    }
+
     /// A basic textual summary of the RAW file.
     public var description: String
     {

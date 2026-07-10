@@ -574,7 +574,7 @@
     <div class="phase-label">Phase 4 · Raw sensor data</div>
 
     <div class="milestone">
-        <h3><span class="num">M6.</span> Raw sensor buffer access (<code>rawdata</code>) <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M6.</span> Raw sensor buffer access (<code>rawdata</code>) <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Give safe Swift access to the unpacked raw sensor samples — the core payload of the
             "metadata + raw sensor data" scope.</p>
         <div class="field">
@@ -591,10 +591,29 @@
                     declared maximum on provided samples.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <p>The buffer-access API design (breadth and lifetime model) was proposed and <strong>confirmed by the owner before implementing</strong>: a <em>focused</em> scope (16-bit Bayer only, with a descriptor reporting the other layouts) offering <em>both</em> a copy and a borrowed view.</p>
+            <ul>
+                <li><strong><code>RAWSensorData</code></strong> (<code>Image/</code>): a value-type descriptor of the unpacked buffer — <code>width</code>/<code>height</code>/<code>pitch</code> from <code>libraw_image_sizes_t</code>, plus a <code>Layout</code> enum (<code>none</code>/<code>bayer</code>/<code>color3</code>/<code>color4</code> and the three <code>float</code> variants) derived from whichever <code>libraw_rawdata_t</code> pointer LibRAW populated, with derived <code>componentCount</code>, <code>isFloatingPoint</code>, and <code>hasBuffer</code>. So a consumer always knows the layout, even for the uncommon multi-channel/float variants that have no dedicated data accessor.</li>
+                <li><strong><code>RAWFile.rawImage: [UInt16]?</code></strong>: a Swift-owned copy of the 16-bit single-channel Bayer buffer, <code>nil</code> when unavailable (not unpacked, or a non-Bayer layout).</li>
+                <li><strong><code>RAWFile.withRawImage(_:)</code></strong>: a zero-copy, closure-scoped borrowed view (<code>UnsafeBufferPointer&lt;UInt16&gt;</code>) into LibRAW-owned memory, valid only for the call and tied to the file's lifetime; documented not to escape. <code>rawImage</code> is implemented on top of it (<code>withRawImage { Array( $0 ) }</code>).</li>
+                <li><strong><code>RAWFile.sensorData</code></strong>: built via <code>withUnsafePointer( to: &amp;…imgdata.rawdata )</code>, reading only the small buffer-pointer fields — it never copies the ~130 KB <code>rawdata</code> struct (which embeds a full color-data with the 128 KB tone curve).</li>
+            </ul>
+            <p><strong>Buffer sizing:</strong> the 16-bit Bayer element count is <code>raw_height × (raw_pitch / 2)</code> (<code>raw_pitch</code> being the byte pitch of the <code>ushort</code> <code>raw_image</code>), guarded on <code>height &gt; 0</code> and <code>pitch &gt; 0</code>. Not-unpacked and no-buffer cases return <code>nil</code>/<code>.none</code>.</li>
+            <p><strong>Tests:</strong> the descriptor's derived properties (<code>componentCount</code>, <code>isFloatingPoint</code>, <code>hasBuffer</code>) are covered deterministically for every layout; the fixture-parameterized geometry/consistency test (copy count == borrowed-view count == <code>height × pitch/2</code>, non-trivial samples) activates once RAW samples are supplied. 37 tests total.</p>
+            <p><strong>Verification (all green):</strong> <code>swift build</code>/<code>swift test</code> debug + release, and <code>xcodebuild</code> Debug test + Release build.</p>
+            <p><strong>Automated review loop:</strong> 1 round; converged. No Critical/High/Medium findings — the reviewer verified the buffer sizing against the header field semantics (moderate-to-high confidence), the borrowed-pointer contract and <code>rethrows</code> soundness, the no-copy <code>rawdata</code> access, and the layout field names/order (corroborated by LibRAW's own <code>have_raw_data()</code>). A suggested doc clarification was applied.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>One fresh-context review round; converged. No Critical/High/Medium findings.</p>
+            <ul>
+                <li><strong>[Info] <code>hasBuffer</code> vs. <code>withRawImage</code> on a degenerate pitch</strong> — <code>sensorData.layout == .bayer</code> whenever <code>raw_image</code> is non-null, but the accessors additionally require <code>raw_pitch &gt; 0</code>; if LibRAW ever left a populated buffer with a zero pitch, <code>hasBuffer</code> would be <code>true</code> while <code>rawImage</code> is <code>nil</code> (theoretical — LibRAW always sets the pitch). <em>Resolution: Fixed</em> — clarified <code>hasBuffer</code>'s doc to say it reflects pointer presence, not that samples will be vended.</li>
+                <li><strong>[Info] Buffer allocation size unverifiable from the vendored tree</strong> — only LibRAW's headers + prebuilt <code>.a</code> are vendored (no <code>.cpp</code>), so <code>unpack()</code>'s exact allocation can't be confirmed from source; the sizing is correct per the header field semantics, and the <code>rawImageMatchesGeometry</code> fixture test will exercise a real buffer end-to-end once samples exist. <em>Resolution: Deferred</em> (verification limitation, not a code defect).</li>
+            </ul>
+            <p>The reviewer confirmed the public API exposes only Swift/stdlib types (no libraw leak), conventions (MIT header, one type per file with the nested <code>Layout</code>, full SwiftDoc, <code>let</code>, no force-unwrap, aligned <code>=</code>), pbxproj internal consistency, and no regressions (37/37 tests, Xcode under <code>-warnings-as-errors</code>).</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 
