@@ -28,8 +28,16 @@ internal import libraw
 ///
 /// Mirrors LibRAW's `libraw_dnglens_t`, the lens focal/aperture range recorded
 /// in the DNG `LensInfo` tag.
-public struct RAWDNGLensInfo: Sendable, Equatable
+public struct RAWDNGLensInfo: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the focal range.
+    public var description: String
+    {
+        self.minFocal == self.maxFocal
+            ? "\( self.minFocal.compactDescription )mm"
+            : "\( self.minFocal.compactDescription )–\( self.maxFocal.compactDescription )mm"
+    }
+
     /// The minimum focal length, in millimeters.
     public let minFocal: Float
 

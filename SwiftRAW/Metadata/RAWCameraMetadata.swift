@@ -30,8 +30,16 @@ internal import libraw
 /// flash output, environmental temperatures, color space, firmware, and
 /// sensitivity. Per-vendor maker-note structures and camera-specific
 /// autofocus data blobs are intentionally out of scope.
-public struct RAWCameraMetadata: Sendable, Equatable
+public struct RAWCameraMetadata: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary: firmware (when known) and color space.
+    public var description: String
+    {
+        let firmware = self.firmware.isEmpty ? "unknown firmware" : "firmware \( self.firmware )"
+
+        return "\( firmware ), color space \( self.colorSpace )"
+    }
+
     /// The flash exposure compensation applied, in stops.
     public let flashExposureCompensation: Float
 

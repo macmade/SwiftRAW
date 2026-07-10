@@ -325,13 +325,29 @@ public final class RAWFile: CustomStringConvertible
         return try body( buffer )
     }
 
-    /// A basic textual summary of the RAW file.
+    /// A rich textual summary of the RAW file: camera, sensor dimensions,
+    /// color-filter array, exposure, and lens, omitting anything the file does
+    /// not record.
     public var description: String
     {
-        let width  = Int( self.raw.pointee.imgdata.sizes.raw_width )
-        let height = Int( self.raw.pointee.imgdata.sizes.raw_height )
+        let info   = self.imageInfo
+        let sizes  = self.imageSizes
+        let cfa    = self.cfaPattern
+        let shot   = self.shotInfo
+        let camera = "\( info.make ) \( info.model )".trimmingCharacters( in: .whitespaces )
 
-        return "RAWFile( \( width )x\( height ), unpacked: \( self.unpacked ) )"
+        let hasExposure = shot.isoSpeed > 0 || shot.shutterSpeed > 0 || shot.aperture > 0 || shot.focalLength > 0
+
+        let parts =
+        [
+            camera.isEmpty ? "RAW file" : camera,
+            "\( sizes.rawWidth )×\( sizes.rawHeight )",
+            cfa.kind == .none ? "" : "\( cfa )",
+            hasExposure ? "\( shot )" : "",
+            self.lensInfo.lensModel,
+        ]
+
+        return parts.filter { $0.isEmpty == false }.joined( separator: ", " )
     }
 
     /// Heap-allocates a LibRAW instance.

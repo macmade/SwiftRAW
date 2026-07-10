@@ -31,8 +31,19 @@ internal import libraw
 /// common layouts: a repeating 2×2 Bayer mosaic and Fuji's 6×6 X-Trans mosaic.
 /// Sensors without a CFA (Foveon, monochrome, or already-demosaiced input) are
 /// reported as ``Kind/none``.
-public struct RAWCFAPattern: Sendable, Equatable
+public struct RAWCFAPattern: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the color-filter-array layout.
+    public var description: String
+    {
+        switch self.kind
+        {
+            case .none:   return "no CFA"
+            case .bayer:  return "Bayer (\( self.colorDescription ))"
+            case .xTrans: return "X-Trans (\( self.colorDescription ))"
+        }
+    }
+
     /// The kind of color-filter array.
     public enum Kind: Sendable, Equatable
     {

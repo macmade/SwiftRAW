@@ -34,10 +34,10 @@ internal import libraw
 ///
 /// The single-channel 16-bit Bayer buffer — by far the most common — is read
 /// through ``RAWFile/rawImage`` and ``RAWFile/withRawImage(_:)``.
-public struct RAWSensorData: Sendable, Equatable
+public struct RAWSensorData: Sendable, Equatable, CustomStringConvertible
 {
     /// The in-memory form of the unpacked sensor data.
-    public enum Layout: Sendable, Equatable
+    public enum Layout: Sendable, Equatable, CustomStringConvertible
     {
         /// No raw buffer is available (the file has not been unpacked, or the
         /// decoder produced none).
@@ -60,6 +60,29 @@ public struct RAWSensorData: Sendable, Equatable
 
         /// A four-channel floating-point buffer (`float4_image`).
         case color4Float
+
+        /// A short name for the layout.
+        public var description: String
+        {
+            switch self
+            {
+                case .none:        return "none"
+                case .bayer:       return "Bayer"
+                case .color3:      return "3-channel"
+                case .color4:      return "4-channel"
+                case .bayerFloat:  return "Bayer float"
+                case .color3Float: return "3-channel float"
+                case .color4Float: return "4-channel float"
+            }
+        }
+    }
+
+    /// A compact summary of the buffer geometry and layout.
+    public var description: String
+    {
+        let plural = self.componentCount == 1 ? "" : "s"
+
+        return "\( self.width )×\( self.height ) \( self.layout ) (\( self.componentCount ) component\( plural ))"
     }
 
     /// The full sensor width, in pixels.

@@ -18,6 +18,7 @@
 		056AD0062FFFE70900F40080 /* RAWCFAPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0052FFFE70900F40080 /* RAWCFAPattern.swift */; };
 		056AD0332FFFE70900F40080 /* RAWSensorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0322FFFE70900F40080 /* RAWSensorData.swift */; };
 		056AD0092FFFE70900F40080 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0082FFFE70900F40080 /* String.swift */; };
+		056AD0372FFFE70900F40080 /* BinaryFloatingPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0362FFFE70900F40080 /* BinaryFloatingPoint.swift */; };
 		056AD0102FFFE70900F40080 /* CFixedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00F2FFFE70900F40080 /* CFixedArray.swift */; };
 		056AD0132FFFE70900F40080 /* RAWShotInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0122FFFE70900F40080 /* RAWShotInfo.swift */; };
 		056AD0152FFFE70900F40080 /* RAWGPSInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0142FFFE70900F40080 /* RAWGPSInfo.swift */; };
@@ -34,6 +35,7 @@
 		056AD00C2FFFE70B00F40080 /* RAWCFAPatternTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */; };
 		056AD00E2FFFE70B00F40080 /* RAWImageMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */; };
 		056AD0352FFFE70B00F40080 /* RAWSensorDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0342FFFE70B00F40080 /* RAWSensorDataTests.swift */; };
+		056AD0392FFFE70B00F40080 /* DescriptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD0382FFFE70B00F40080 /* DescriptionsTests.swift */; };
 		056AD01B2FFFE70B00F40080 /* CFixedArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD01A2FFFE70B00F40080 /* CFixedArrayTests.swift */; };
 		056AD01E2FFFE70B00F40080 /* RAWGPSInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD01D2FFFE70B00F40080 /* RAWGPSInfoTests.swift */; };
 		056AD0202FFFE70B00F40080 /* RAWShotInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056AD01F2FFFE70B00F40080 /* RAWShotInfoTests.swift */; };
@@ -115,6 +117,7 @@
 		056AD0322FFFE70900F40080 /* RAWSensorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWSensorData.swift; sourceTree = "<group>"; };
 		056AD0082FFFE70900F40080 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		056AD00F2FFFE70900F40080 /* CFixedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFixedArray.swift; sourceTree = "<group>"; };
+		056AD0362FFFE70900F40080 /* BinaryFloatingPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryFloatingPoint.swift; sourceTree = "<group>"; };
 		056AD0122FFFE70900F40080 /* RAWShotInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWShotInfo.swift; sourceTree = "<group>"; };
 		056AD0142FFFE70900F40080 /* RAWGPSInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWGPSInfo.swift; sourceTree = "<group>"; };
 		056AD0172FFFE70900F40080 /* RAWColorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWColorData.swift; sourceTree = "<group>"; };
@@ -129,6 +132,7 @@
 		056AD00B2FFFE70B00F40080 /* RAWCFAPatternTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWCFAPatternTests.swift; sourceTree = "<group>"; };
 		056AD00D2FFFE70B00F40080 /* RAWImageMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWImageMetadataTests.swift; sourceTree = "<group>"; };
 		056AD0342FFFE70B00F40080 /* RAWSensorDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWSensorDataTests.swift; sourceTree = "<group>"; };
+		056AD0382FFFE70B00F40080 /* DescriptionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionsTests.swift; sourceTree = "<group>"; };
 		056AD01A2FFFE70B00F40080 /* CFixedArrayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFixedArrayTests.swift; sourceTree = "<group>"; };
 		056AD01D2FFFE70B00F40080 /* RAWGPSInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWGPSInfoTests.swift; sourceTree = "<group>"; };
 		056AD01F2FFFE70B00F40080 /* RAWShotInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAWShotInfoTests.swift; sourceTree = "<group>"; };
@@ -361,6 +365,7 @@
 		056AD0072FFFE70900F40080 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				056AD0362FFFE70900F40080 /* BinaryFloatingPoint.swift */,
 				056AD00F2FFFE70900F40080 /* CFixedArray.swift */,
 				056AD0082FFFE70900F40080 /* String.swift */,
 			);
@@ -388,6 +393,7 @@
 				056AD02D2FFFE70B00F40080 /* Lens */,
 				056AD01C2FFFE70B00F40080 /* Metadata */,
 				056ACFD42FFFE70B00F40080 /* SwiftRAWTests.swift */,
+				056AD0382FFFE70B00F40080 /* DescriptionsTests.swift */,
 				056ACFE42FFFE70B00F40080 /* TestError.swift */,
 				056ACFE62FFFE70B00F40080 /* TestUtilities.swift */,
 			);
@@ -569,6 +575,7 @@
 				056AD0062FFFE70900F40080 /* RAWCFAPattern.swift in Sources */,
 				056AD0332FFFE70900F40080 /* RAWSensorData.swift in Sources */,
 				056AD0092FFFE70900F40080 /* String.swift in Sources */,
+				056AD0372FFFE70900F40080 /* BinaryFloatingPoint.swift in Sources */,
 				056AD0102FFFE70900F40080 /* CFixedArray.swift in Sources */,
 				056AD0132FFFE70900F40080 /* RAWShotInfo.swift in Sources */,
 				056AD0152FFFE70900F40080 /* RAWGPSInfo.swift in Sources */,
@@ -586,6 +593,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				056ACFD62FFFE70B00F40080 /* SwiftRAWTests.swift in Sources */,
+				056AD0392FFFE70B00F40080 /* DescriptionsTests.swift in Sources */,
 				056ACFE52FFFE70B00F40080 /* TestError.swift in Sources */,
 				056ACFE72FFFE70B00F40080 /* TestUtilities.swift in Sources */,
 				056ACFEA2FFFE70B00F40080 /* RAWFileTests.swift in Sources */,

@@ -30,8 +30,18 @@ internal import libraw
 /// Mirrors the broadly useful fields of LibRAW's `libraw_makernotes_lens_t`.
 /// Camera-specific fields (mount/format codes, accessory IDs, per-vendor lens
 /// substructures) are intentionally out of scope.
-public struct RAWMakerNoteLensInfo: Sendable, Equatable
+public struct RAWMakerNoteLensInfo: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the lens name and focal range.
+    public var description: String
+    {
+        let range = self.minFocal == self.maxFocal
+            ? "\( self.minFocal.compactDescription )mm"
+            : "\( self.minFocal.compactDescription )–\( self.maxFocal.compactDescription )mm"
+
+        return self.lensModel.isEmpty ? range : "\( self.lensModel ) (\( range ))"
+    }
+
     /// Whether a lens has a fixed or variable focal length.
     public enum FocalType: Sendable, Equatable
     {

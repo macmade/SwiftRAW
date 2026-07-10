@@ -620,7 +620,7 @@
     <div class="phase-label">Phase 5 · Polish, docs &amp; release readiness</div>
 
     <div class="milestone">
-        <h3><span class="num">M7.</span> Extensions, descriptions &amp; API/test audit <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M7.</span> Extensions, descriptions &amp; API/test audit <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Round out ergonomics and consistency, and broaden the test suite to reference-project
             breadth.</p>
         <div class="field">
@@ -638,10 +638,28 @@
                     across multiple camera makes among the provided samples.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <ul>
+                <li><strong>API / convention audit — clean:</strong> no force-unwraps, no <code>try!</code>/<code>as!</code>, no raw <code>for</code> loops; <code>let</code>/<code>var</code> usage all legitimate (computed properties, and the genuinely-mutable <code>RAWParsingOptions.unpacksImmediately</code> / <code>RAWFile.unpacked</code>); full SwiftDoc on public and private members. One pre-existing item surfaced to the owner: <code>SwiftRAW/SwiftRAW.swift</code> is a content-free placeholder (license header + <code>import Foundation</code>, no types).</li>
+                <li><strong><code>CustomStringConvertible</code></strong> added to all the metadata value types (<code>RAWImageSizes</code>, <code>RAWImageInfo</code>, <code>RAWCFAPattern</code>, <code>RAWSensorData</code> + its <code>Layout</code>, <code>RAWShotInfo</code>, <code>RAWGPSInfo</code>, <code>RAWColorData</code>, <code>RAWLensInfo</code>, <code>RAWMakerNoteLensInfo</code>, <code>RAWDNGLensInfo</code>, <code>RAWCameraMetadata</code>, <code>RAWParsingOptions</code>), plus a rich <code>RAWFile.description</code> composing camera, sensor dimensions, CFA, exposure and lens (omitting anything the file does not record). Verified against the real CR3 fixture, e.g. <code>Canon EOS R7, 7128×4732, Bayer (RGBG), ISO 100, 4.8s, f/8, 50mm, RF50mm F1.8 STM</code>.</li>
+                <li><strong><code>BinaryFloatingPoint.compactDescription</code></strong> (<code>Extensions/</code>): a trap-safe helper that trims a trailing <code>.0</code> from whole values and falls back for non-finite/oversized values. No <code>Data</code> convenience was added — the buffer copy + borrowed view already cover buffer access.</li>
+                <li><strong>Tests broadened:</strong> a deterministic <code>DescriptionsTests</code> suite, a <code>hasTestFiles</code> consistency check, a fixture-driven rich-description test, and a trap-safety regression test. 46 tests total.</li>
+            </ul>
+            <p><strong>Verification (all green):</strong> <code>swift build</code>/<code>swift test</code> debug + release, and <code>xcodebuild</code> Debug test + Release build.</p>
+            <p><strong>Automated review loop:</strong> 2 rounds. Round 1 found a Medium crash risk (an <code>Int(Float)</code> conversion in <code>RAWShotInfo.description</code> that traps on non-finite/oversized exposure values from corrupt input, reachable via <code>print(rawFile)</code>) and a Low doc/output mismatch; both fixed, with a regression test added. Round 2 (fresh reviewer, focused on the fix) traced every float→Int conversion and confirmed the fix correct and complete — converged.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>Two fresh-context review rounds; converged.</p>
+            <ul>
+                <li><strong>[Medium] <code>Int(Float)</code> trap in <code>RAWShotInfo.description</code></strong> — <code>Int(self.isoSpeed)</code> (with only a <code>&gt; 0</code> guard, which admits <code>+inf</code>) and <code>Int((1/shutterSpeed).rounded())</code> (a tiny shutter → <code>inf</code>) abort at runtime; reachable via <code>RAWFile.description</code> on a corrupt/crafted file. <em>Resolution: Fixed</em> — ISO routes through <code>compactDescription</code>; the shutter denominator is guarded (<code>isFinite &amp;&amp; &lt; 1e9</code>) before <code>Int(...)</code>; a trap-safety test feeding <code>.infinity</code>/<code>.leastNonzeroMagnitude</code>/<code>.nan</code> was added.</li>
+                <li><strong>[Low] Rich file description showed placeholder sub-descriptions</strong> — <code>"no CFA"</code>/<code>"no exposure data"</code> always appeared, contradicting the doc's &ldquo;omitting anything the file does not record&rdquo;. <em>Resolution: Fixed</em> — the CFA part is dropped when <code>kind == .none</code> and the exposure part unless any exposure value is present; the predicates match <code>RAWShotInfo</code>'s own empty condition exactly.</li>
+                <li><strong>[Info] <code>compactDescription</code> verified trap-safe</strong> (guards finiteness + range before <code>Int</code>). <em>Resolution: none needed.</em></li>
+                <li><strong>[Info] GPS latitude/longitude at full precision vs. altitude via <code>compactDescription</code></strong> — a minor formatting inconsistency, no correctness issue. <em>Resolution: Deferred.</em></li>
+            </ul>
+            <p>Round 2 verdict: no remaining float→Int trap anywhere in the description paths; normal values render unchanged; the Low fix is consistent in both directions; conventions intact; no regressions (46/46 tests, Xcode under <code>-warnings-as-errors</code>).</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 

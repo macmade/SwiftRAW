@@ -30,8 +30,18 @@ internal import libraw
 /// identity parsed from EXIF, with the maker-note (``makerNotes``) and DNG
 /// (``dng``) lens substructures surfaced separately. Per-vendor lens
 /// substructures are intentionally out of scope.
-public struct RAWLensInfo: Sendable, Equatable
+public struct RAWLensInfo: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the lens: its name (when known) and focal range.
+    public var description: String
+    {
+        let range = self.minFocal == self.maxFocal
+            ? "\( self.minFocal.compactDescription )mm"
+            : "\( self.minFocal.compactDescription )–\( self.maxFocal.compactDescription )mm"
+
+        return self.lensModel.isEmpty ? range : "\( self.lensModel ) (\( range ))"
+    }
+
     /// The minimum focal length, in millimeters.
     public let minFocal: Float
 

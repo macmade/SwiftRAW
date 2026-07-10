@@ -30,8 +30,16 @@ internal import libraw
 /// and saturation levels that bound the sample range, the white-balance
 /// multipliers, and the color-conversion matrices. The full per-block black
 /// map, tone curve, and per-vendor color tables are beyond this curated scope.
-public struct RAWColorData: Sendable, Equatable
+public struct RAWColorData: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the black and saturation levels.
+    public var description: String
+    {
+        let profile = self.hasEmbeddedColorProfile ? ", ICC profile" : ""
+
+        return "black \( self.blackLevel ), max \( self.maximum )\( profile )"
+    }
+
     /// The global black level subtracted from raw samples.
     public let blackLevel: Int
 

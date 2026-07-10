@@ -30,8 +30,44 @@ internal import libraw
 /// Mirrors the commonly used fields of LibRAW's `libraw_imgother_t`, plus the
 /// camera body serial from `libraw_shootinginfo_t`. Camera-specific shooting
 /// mode codes are intentionally left out of this curated, cross-vendor subset.
-public struct RAWShotInfo: Sendable, Equatable
+public struct RAWShotInfo: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the exposure settings (ISO, shutter, aperture,
+    /// focal length), omitting values the file does not record.
+    public var description: String
+    {
+        let shutter: String
+
+        if self.shutterSpeed > 0, self.shutterSpeed < 1
+        {
+            let denominator = ( 1 / self.shutterSpeed ).rounded()
+
+            shutter = denominator.isFinite && denominator < 1e9
+                ? "1/\( Int( denominator ) )s"
+                : "\( self.shutterSpeed.compactDescription )s"
+        }
+        else if self.shutterSpeed > 0
+        {
+            shutter = "\( self.shutterSpeed.compactDescription )s"
+        }
+        else
+        {
+            shutter = ""
+        }
+
+        let parts =
+        [
+            self.isoSpeed    > 0 ? "ISO \( self.isoSpeed.compactDescription )" : "",
+            shutter,
+            self.aperture    > 0 ? "f/\( self.aperture.compactDescription )" : "",
+            self.focalLength > 0 ? "\( self.focalLength.compactDescription )mm" : "",
+        ]
+
+        let summary = parts.filter { $0.isEmpty == false }.joined( separator: ", " )
+
+        return summary.isEmpty ? "no exposure data" : summary
+    }
+
     /// The ISO sensitivity.
     public let isoSpeed: Float
 

@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
+import Foundation
 internal import libraw
 
 /// Camera identification and sensor-description metadata for a RAW image.
@@ -30,8 +31,17 @@ internal import libraw
 /// make and model, LibRAW also provides normalized identifiers (stable strings
 /// LibRAW derives across firmware/marketing variations) and the color-filter
 /// description used to interpret the raw samples.
-public struct RAWImageInfo: Sendable, Equatable
+public struct RAWImageInfo: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the camera and color-filter description.
+    public var description: String
+    {
+        let camera = "\( self.make ) \( self.model )".trimmingCharacters( in: .whitespaces )
+        let name   = camera.isEmpty ? "Unknown camera" : camera
+
+        return "\( name ) — \( self.colors ) colors (\( self.colorDescription ))"
+    }
+
     /// The camera manufacturer, as recorded in the file.
     public let make: String
 

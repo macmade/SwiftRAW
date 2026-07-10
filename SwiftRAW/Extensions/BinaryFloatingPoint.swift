@@ -22,35 +22,21 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-/// Options controlling how a ``RAWFile`` is parsed.
-///
-/// The read-only scope keeps this intentionally small; it currently only
-/// governs when the RAW data is unpacked.
-public struct RAWParsingOptions: Sendable, Equatable, CustomStringConvertible
+extension BinaryFloatingPoint
 {
-    /// A compact summary of the options.
-    public var description: String
-    {
-        self.unpacksImmediately ? "eager unpack" : "lazy unpack"
-    }
-
-    /// Whether the RAW data is unpacked as soon as the file is opened.
+    /// A compact textual form for descriptions: whole values drop the trailing
+    /// `.0` (e.g. `50` rather than `50.0`), while fractional values keep their
+    /// shortest round-tripping representation (e.g. `2.8`).
     ///
-    /// When `true` (the default), ``RAWFile`` unpacks eagerly during
-    /// initialization, so any open error and any unpack error surface up front.
-    /// When `false`, unpacking is deferred: call ``RAWFile/unpack()`` (or access
-    /// data that requires it) to unpack on demand.
-    public var unpacksImmediately: Bool
-
-    /// The default options: eager unpacking.
-    public static let `default` = RAWParsingOptions()
-
-    /// Creates a set of parsing options.
-    ///
-    /// - Parameter unpacksImmediately: Whether to unpack the RAW data as soon as
-    ///   the file is opened. Defaults to `true`.
-    public init( unpacksImmediately: Bool = true )
+    /// Non-finite or very large values fall back to the default representation.
+    internal var compactDescription: String
     {
-        self.unpacksImmediately = unpacksImmediately
+        guard self.isFinite, self == self.rounded(), abs( self ) < 1e9
+        else
+        {
+            return "\( self )"
+        }
+
+        return String( Int( self ) )
     }
 }

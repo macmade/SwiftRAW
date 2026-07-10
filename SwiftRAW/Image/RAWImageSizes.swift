@@ -30,8 +30,14 @@ internal import libraw
 /// unpacked sensor buffer (including any masked/optical-black margins), while
 /// the output dimensions describe the visible image after applying those
 /// margins.
-public struct RAWImageSizes: Sendable, Equatable
+public struct RAWImageSizes: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the raw and output dimensions.
+    public var description: String
+    {
+        "raw \( self.rawWidth )×\( self.rawHeight ), output \( self.width )×\( self.height )"
+    }
+
     /// The full sensor width, in pixels, including margins.
     public let rawWidth: Int
 

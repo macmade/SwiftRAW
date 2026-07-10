@@ -31,8 +31,14 @@ internal import libraw
 /// resolves them into signed decimal degrees (negative for south/west) and a
 /// signed altitude (negative below sea level), while still exposing the raw
 /// reference markers.
-public struct RAWGPSInfo: Sendable, Equatable
+public struct RAWGPSInfo: Sendable, Equatable, CustomStringConvertible
 {
+    /// A compact summary of the coordinates, `latitude, longitude, altitude`.
+    public var description: String
+    {
+        "\( self.latitude ), \( self.longitude ), \( self.altitude.compactDescription )m"
+    }
+
     /// The latitude in signed decimal degrees (negative for the southern
     /// hemisphere).
     public let latitude: Double
