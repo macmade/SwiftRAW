@@ -379,7 +379,7 @@
     <div class="phase-label">Phase 2 · Core lifecycle &amp; error model</div>
 
     <div class="milestone">
-        <h3><span class="num">M2.</span> <code>RAWError</code>, <code>RAWFile</code> lifecycle &amp; open/unpack <span class="status not-started">Not started</span></h3>
+        <h3><span class="num">M2.</span> <code>RAWError</code>, <code>RAWFile</code> lifecycle &amp; open/unpack <span class="status completed">Completed</span></h3>
         <p><strong>Goal:</strong> Establish the core reference type and error model: open a RAW file from a URL or in-memory
             data, unpack it, map LibRAW status codes to Swift errors, and manage the <code>LibRaw</code> instance's
             lifetime safely.</p>
@@ -405,10 +405,33 @@
                     corrupt input error mapping.</li>
             </ul>
         </div>
-        <div class="field"><div class="field-label">Status</div><span class="status not-started">Not started</span></div>
-        <div class="field"><div class="field-label">Completed</div><span class="placeholder">—</span></div>
-        <div class="field"><div class="field-label">Implementation notes</div><p class="placeholder">To be filled during implementation.</p></div>
-        <div class="field"><div class="field-label">Automated review</div><p class="placeholder">To be filled by the automated review loop.</p></div>
+        <div class="field"><div class="field-label">Status</div><span class="status completed">Completed</span></div>
+        <div class="field"><div class="field-label">Completed</div>2026-07-10</div>
+        <div class="field"><div class="field-label">Implementation notes</div>
+            <p>Implemented after validating the C++ interop approach with a throwaway probe (create a heap <code>LibRaw</code>, read an <code>imgdata</code> member and call a method through the pointer — no crash under either build system).</p>
+            <ul>
+                <li><strong>Binding approach (owner's choice):</strong> the <strong>C++ shim</strong>. <code>LibRAW/include/SwiftRAWLibRaw.h</code> provides inline <code>SwiftRAWCreateLibRaw</code>/<code>SwiftRAWDestroyLibRaw</code> that heap-allocate/free a <code>LibRaw</code>; it was added to the existing <code>libraw</code> module map (placed in <code>LibRAW/include/</code> so its <code>"libraw/libraw.h"</code> quote-include resolves — an angle include failed during module compilation). Swift holds an <code>UnsafeMutablePointer&lt;LibRaw&gt;</code> and calls the C++ lifecycle methods and reads <code>imgdata</code> through the pointer. No new build-system wiring was needed (both systems already expose <code>LibRAW/include</code>).</li>
+                <li><strong><code>RAWError</code>:</strong> pure-Swift enum (no LibRAW dependency), <code>LocalizedError</code>/<code>CustomStringConvertible</code>/<code>Sendable</code>, cases <code>invalidFileURL</code>, <code>cannotReadFile</code>, <code>openFailed</code>, <code>unpackFailed</code>, <code>unsupportedFormat</code>, and a generic <code>libRAWError</code>, all with a <code>"RAW Error: …"</code> description.</li>
+                <li><strong><code>RAWFile</code>:</strong> <code>public final class</code>, <code>init(url:options:)</code> (via <code>open_file</code>) and <code>init(data:options:)</code> (via <code>open_buffer</code>); heap-owned <code>LibRaw</code> released on <code>deinit</code>; eager/lazy idempotent <code>unpack()</code>; basic <code>CustomStringConvertible</code> summary. Status codes are mapped through <code>libraw_strerror</code>, with <code>LIBRAW_FILE_UNSUPPORTED</code> special-cased to <code>unsupportedFormat</code> for both open and unpack. Not <code>Sendable</code> (matches the reference libraries).</li>
+                <li><strong><code>RAWParsingOptions</code>:</strong> minimal — <code>unpacksImmediately</code> (eager vs. lazy).</li>
+                <li><strong>Cross-build portability:</strong> because <code>Package.swift</code> has no <code>platforms</code> floor (old default) while Xcode targets macOS 15 with <code>-warnings-as-errors</code>, <code>URL.path</code>/<code>path(percentEncoded:)</code> were both unusable; used <code>withUnsafeFileSystemRepresentation</code> (path for LibRAW) and <code>absoluteString</code> (error messages).</li>
+                <li><strong>Tests:</strong> <code>TestError</code> and <code>TestUtilities</code> (<code>#filePath</code>-based <code>Test Files/</code> discovery, graceful when empty), plus <code>RAWFileTests</code>/<code>RAWErrorTests</code>. 14 tests run today (error paths, discovery, error descriptions); the fixture-parameterized open/unpack/data tests run zero cases until real RAW samples are supplied.</li>
+            </ul>
+            <p><strong>Critical bug found &amp; fixed during review:</strong> <code>LibRaw::open_buffer</code> wraps the caller's pointer in a datastream that stores only a bare <code>unsigned char *buf</code> (verified in <code>libraw_datastream.h</code>) and reads it lazily during <code>unpack</code> — it does <em>not</em> copy. The original <code>init(data:)</code> passed the transient <code>Data.withUnsafeBytes</code> pointer, a use-after-free once the closure returned. Fixed by copying the bytes into a stable <code>UnsafeMutableRawBufferPointer</code> the file owns for its lifetime, freed in <code>deinit</code> (after <code>recycle()</code>) and on every throwing path. Full runtime validation of the read path awaits real fixtures (the <code>openFixtureFromData</code> test covers it); the fix is correct by construction and confirmed by re-review.</p>
+            <p><strong>Verification (all green):</strong> <code>swift build</code>/<code>swift test</code> debug + release (14 tests), and <code>xcodebuild</code> Debug test + Release build.</p>
+            <p><strong>Automated review loop:</strong> 2 rounds. Round 1 found the Critical use-after-free (plus minor items), all addressed. Round 2 (fresh reviewer, focused on the memory model) traced every path and confirmed the fix correct and complete — no leak, no double-free, no new issues. Converged.</p>
+        </div>
+        <div class="field"><div class="field-label">Automated review</div>
+            <p>Two fresh-context review rounds; converged.</p>
+            <ul>
+                <li><strong>[Critical] Use-after-free in <code>init(data:)</code></strong> &mdash; <code>open_buffer</code> aliases the caller's pointer without copying and reads it lazily during <code>unpack</code>; the original code passed the transient <code>Data.withUnsafeBytes</code> pointer, dangling once the closure returned. <em>Resolution: Fixed</em> &mdash; the bytes are copied into a stable buffer the file owns for its lifetime, freed after <code>recycle()</code>/destroy on all paths.</li>
+                <li><strong>[Low] Inconsistent explicit <code>recycle()</code> before destroy</strong> across teardown paths. <em>Resolution: Fixed</em> &mdash; teardown made uniform (<code>recycle()</code> + destroy + buffer deallocate everywhere).</li>
+                <li><strong>[Info] Unused internal <code>libRaw</code> accessor</strong> (forward-looking for M3). <em>Resolution: Fixed</em> &mdash; removed; it will be reintroduced in M3 when metadata accessors actually need it.</li>
+                <li><strong>[Info] Shallow <code>init(data:)</code> error assertions; <code>unsupportedFormat</code> mapping unverified</strong> without a fixture that returns that code. <em>Resolution: Deferred</em> &mdash; revisit when fixtures land (M7 broadens tests).</li>
+                <li><strong>[Info] Redundant explicit <code>recycle()</code> before <code>delete</code></strong> (round 2) &mdash; <code>~LibRaw</code> already recycles; harmless because idempotent. <em>Resolution: Deferred</em> &mdash; kept intentionally to honor the plan's &ldquo;<code>recycle()</code> on deinit&rdquo;.</li>
+            </ul>
+            <p>Round 2 verdict: use-after-free genuinely fixed, ownership model sound on every traced path, no new correctness or memory-safety problems. Conventions (MIT header, one type per file, full SwiftDoc incl. private members, <code>let</code>, no force-unwrap, aligned <code>=</code>) confirmed; pbxproj internally consistent; no regressions to M1.</p>
+        </div>
         <div class="field"><div class="field-label">Review comments</div><p class="placeholder">Awaiting human review.</p></div>
     </div>
 

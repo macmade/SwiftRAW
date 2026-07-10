@@ -12,6 +12,7 @@
 module libraw
 {
     header "libraw/libraw.h"
+    header "SwiftRAWLibRaw.h"
 
     requires cplusplus
 
