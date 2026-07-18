@@ -18,7 +18,7 @@ DIR_TMP             := $(DIR_ROOT)tmp/
 DIR_INC             := $(DIR_ROOT)include/
 DIR_LIB             := $(DIR_ROOT)lib/
 
-LIBRAW_VERSION      := 0.22.1
+LIBRAW_VERSION      := 0.22.2
 LIBRAW_URL          := https://github.com/LibRaw/LibRaw/archive/refs/tags/$(LIBRAW_VERSION).tar.gz
 LIBRAW_SRC          := $(DIR_TMP)libraw-src.tar.gz
 LIBRAW_DIR          := LibRaw-$(LIBRAW_VERSION)

@@ -36,15 +36,15 @@ struct SwiftRAWTests
     @Test
     func libRAWVersionString() async throws
     {
-        #expect( LibRAWVersion.string == "0.22.1-Release" )
+        #expect( LibRAWVersion.string == "0.22.2-Release" )
     }
 
     /// The LibRAW version number is readable through C++ interop and matches
-    /// the vendored library version (0.22.1 → `0x001601`).
+    /// the vendored library version (0.22.2 → `0x001602`).
     @Test
     func libRAWVersionNumber() async throws
     {
-        #expect( LibRAWVersion.number == ( 0 << 16 ) | ( 22 << 8 ) | 1 )
+        #expect( LibRAWVersion.number == ( 0 << 16 ) | ( 22 << 8 ) | 2 )
     }
 
     /// A LibRAW instance can be created and destroyed from Swift, proving that
