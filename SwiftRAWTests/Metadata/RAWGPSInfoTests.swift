@@ -36,7 +36,7 @@ struct RAWGPSInfoTests
     {
         let value = RAWGPSInfo.decimalDegrees( [ 48, 51, 30 ], isNegative: false )
 
-        #expect( abs( value - 48.858_333 ) < 0.000_1 )
+        #expect( Swift.abs( value - 48.858_333 ) < 0.000_1 )
     }
 
     /// A southern/western coordinate is negated.
@@ -46,7 +46,7 @@ struct RAWGPSInfoTests
         let value = RAWGPSInfo.decimalDegrees( [ 33, 51, 54 ], isNegative: true )
 
         #expect( value < 0 )
-        #expect( abs( value - -33.865 ) < 0.001 )
+        #expect( Swift.abs( value - -33.865 ) < 0.001 )
     }
 
     /// Missing DMS components are treated as zero rather than crashing.
