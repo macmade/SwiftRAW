@@ -71,7 +71,7 @@ struct RAWSensorDataTests
 
     /// For real Bayer samples, the copied buffer and the borrowed view agree,
     /// match the geometry, and carry non-trivial data. Non-Bayer layouts expose
-    /// no 16-bit Bayer buffer. Runs no cases until fixtures are supplied.
+    /// no 16-bit Bayer buffer.
     @Test( arguments: TestUtilities.rawFileURLs )
     func rawImageMatchesGeometry( url: URL ) throws
     {

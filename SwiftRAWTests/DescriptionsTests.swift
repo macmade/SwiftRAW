@@ -140,7 +140,7 @@ struct DescriptionsTests
     }
 
     /// The rich file description is non-empty and includes the sensor
-    /// dimensions for real samples. Runs no cases until fixtures are supplied.
+    /// dimensions for real samples.
     @Test( arguments: TestUtilities.rawFileURLs )
     func fileDescriptionIsRich( url: URL ) throws
     {

@@ -43,7 +43,7 @@ struct RAWLensInfoTests
     }
 
     /// Lens information reads without crashing and has non-negative focal
-    /// values for real samples. Runs no cases until fixtures are supplied.
+    /// values for real samples.
     @Test( arguments: TestUtilities.rawFileURLs )
     func lensInfoIsReadable( url: URL ) throws
     {

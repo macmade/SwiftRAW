@@ -26,26 +26,30 @@ import Foundation
 
 /// Helpers for locating the user-supplied RAW fixture files.
 ///
-/// Fixtures live in a `Test Files/` directory at the repository root and are
+/// Fixtures live in a `Test Files/` directory at the repository root, outside
+/// any target directory, so they cannot be declared as SwiftPM package resources
+/// and are deliberately not bundled into the test bundle either. They are
 /// discovered relative to this source file via `#filePath`, which resolves on
-/// the machine that built the tests under both SwiftPM and Xcode. When no
-/// fixtures are present the suite still runs: fixture-driven tests simply have
-/// nothing to iterate over.
+/// the machine that built the tests under both SwiftPM and Xcode.
+///
+/// Missing fixtures are a hard failure, not a skip: ``hasTestFiles`` is asserted
+/// by `RAWFileTests.testFilesArePresent()`, so an incomplete checkout fails the
+/// suite instead of silently reducing the fixture-driven tests to zero cases.
 enum TestUtilities
 {
     /// The `Test Files/` directory at the repository root.
-    static let testFilesDirectory: URL = URL( fileURLWithPath: #filePath )
+    static let testFilesDirectory: URL = .init( fileURLWithPath: #filePath )
         .deletingLastPathComponent() // SwiftRAWTests/
         .deletingLastPathComponent() // repository root
         .appendingPathComponent( "Test Files", isDirectory: true )
 
     /// The file extensions recognized as RAW fixtures, lowercased.
     static let rawFileExtensions: Set< String > =
-    [
-        "cr2", "cr3", "crw", "nef", "nrw", "arw", "sr2", "srf",
-        "dng", "raf", "rw2", "orf", "pef", "srw", "rwl", "iiq",
-        "3fr", "fff", "mos", "mrw", "kdc", "dcr", "erf", "x3f",
-    ]
+        [
+            "cr2", "cr3", "crw", "nef", "nrw", "arw", "sr2", "srf",
+            "dng", "raf", "rw2", "orf", "pef", "srw", "rwl", "iiq",
+            "3fr", "fff", "mos", "mrw", "kdc", "dcr", "erf", "x3f",
+        ]
 
     /// All RAW fixture URLs found under ``testFilesDirectory``, searched
     /// recursively and sorted for deterministic ordering.

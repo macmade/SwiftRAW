@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-@testable import SwiftRAW
 import Foundation
+@testable import SwiftRAW
 import Testing
 
 /// Tests for ``RAWGPSInfo`` coordinate conversion, plus graceful handling of
@@ -57,8 +57,7 @@ struct RAWGPSInfoTests
         #expect( RAWGPSInfo.decimalDegrees( [], isNegative: false ) == 0 )
     }
 
-    /// Reading GPS from a file never crashes and is `nil` when absent. Runs no
-    /// cases until fixtures are supplied.
+    /// Reading GPS from a file never crashes and is `nil` when absent.
     @Test( arguments: TestUtilities.rawFileURLs )
     func gpsInfoIsSafeToRead( url: URL ) throws
     {

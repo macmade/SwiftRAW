@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-@testable import SwiftRAW
 import Foundation
+@testable import SwiftRAW
 import Testing
 
 /// Tests for opening and unpacking a ``RAWFile``.
@@ -108,8 +108,19 @@ struct RAWFileTests
         #expect( TestUtilities.testFilesDirectory.lastPathComponent == "Test Files" )
     }
 
+    /// The committed RAW fixtures are present.
+    ///
+    /// Guards the fixture-driven tests below: without this, an incomplete
+    /// checkout would reduce every `arguments: TestUtilities.rawFileURLs` test to
+    /// zero cases and the suite would pass without exercising anything.
+    @Test
+    func testFilesArePresent()
+    {
+        #expect( TestUtilities.hasTestFiles )
+    }
+
     /// Every provided RAW fixture opens and unpacks eagerly, and reports a
-    /// non-empty description. Runs no cases until fixtures are supplied.
+    /// non-empty description.
     @Test( arguments: TestUtilities.rawFileURLs )
     func openFixtureEagerly( url: URL ) throws
     {
@@ -119,7 +130,6 @@ struct RAWFileTests
     }
 
     /// Every provided RAW fixture can be opened lazily and unpacked on demand.
-    /// Runs no cases until fixtures are supplied.
     @Test( arguments: TestUtilities.rawFileURLs )
     func openFixtureLazily( url: URL ) throws
     {
@@ -132,7 +142,6 @@ struct RAWFileTests
     }
 
     /// A fixture opened from in-memory data behaves like one opened from a URL.
-    /// Runs no cases until fixtures are supplied.
     @Test( arguments: TestUtilities.rawFileURLs )
     func openFixtureFromData( url: URL ) throws
     {
