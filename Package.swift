@@ -44,7 +44,13 @@ let package = Package(
                 .interoperabilityMode( .Cxx ),
             ],
             linkerSettings: [
-                .unsafeFlags( [ "-L", "LibRAW/lib" ] ),
+                // Linker flags are passed through verbatim, so a relative search
+                // path would resolve against whichever package drives the build,
+                // not this one — breaking the link as soon as SwiftRAW is consumed
+                // as a dependency. `Context.packageDirectory` always names this
+                // package's own directory, including when its manifest is
+                // evaluated as a dependency of another.
+                .unsafeFlags( [ "-L", "\( Context.packageDirectory )/LibRAW/lib" ] ),
             ]
         ),
         .testTarget(
